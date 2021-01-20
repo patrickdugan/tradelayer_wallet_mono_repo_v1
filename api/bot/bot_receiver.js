@@ -1,7 +1,7 @@
 const client = require('socket.io-client');
 const tl = require('./TradeLayerRPCAPI').tl
 
-const URL = 'http://localhost' //replace this with the ip address of the listener, assumes a static ip
+const URL = 'http://localhost';
 const PORT = 9876
 
 const options = {
@@ -79,10 +79,12 @@ class Receiver {
 
     commitToChannel(multiSigAddress) {
         console.log(`Commit toChannel!`)
-        tl.commitToChannel(this.address, multiSigAddress, this.propertyId, this.amount, (data) => {
+        tl.commitToChannel(this.address, multiSigAddress, this.propertyId, this.amount, (result) => {
+            const { data, error } = result;
+            if (error) return console.log(error.message);
             console.log(`Commited to The multisig Address, result: ${data}`)
             if (data) {
-                this.io.emit('multisig')
+                this.io.emit('multisig');
             }
          })
     }

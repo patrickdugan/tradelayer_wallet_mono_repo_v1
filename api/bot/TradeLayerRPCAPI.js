@@ -536,8 +536,9 @@ tl.publishOracleData = function(fromaddress, title, high, low, close, cb){
 }
 
 tl.commitToChannel = function(sendingAddress,channelAddress,propertyid,amount, cb){
-      client.cmd('tl_commit_tochannel',sendingAddress,channelAddress,propertyid,amount,function(err, data, resHeaders){
-        return cb(data)
+      client.cmd('tl_commit_tochannel',sendingAddress,channelAddress,propertyid,amount, (error, data, resHeaders) => {
+        if (error) return cb({error});
+        cb({data});
       })
 }
 

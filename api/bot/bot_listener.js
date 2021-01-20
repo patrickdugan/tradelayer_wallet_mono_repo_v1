@@ -67,7 +67,9 @@ class Listener {
     }
     commitToChannel(multiSig) {
         console.log(`Commit toChannel!`)
-        tl.commitToChannel(this.address, multiSig.address, this.propertyId, this.amount, (data) => {
+        tl.commitToChannel(this.address, multiSig.address, this.propertyId, this.amount, (result) => {
+            const { data, error } = result;
+            if (error) return console.log(error.message);
             console.log(`Commited to The multisig Address, result: ${data}`)
             const multySigData = {
                  'multisig': multiSig,
