@@ -169,13 +169,20 @@ txnRouter.get('/buildRawCustomPayloadTx', async (request, response) => {
 })
 
 txnRouter.get('/getSimpleSendPayload', async (req, res) => {
-    const {  propertyId, quantity } = req.query
+    const { propertyId, quantity } = req.query
     const { omniClient, tlClient } = req;
     tlClient.tl.createpayload_simpleSend(parseInt(propertyId), quantity, (result) => {
         res.send(result)
     })
 });
 
+txnRouter.get('/callRPC', (req, res) => {
+    const { tlClient } = req;
+    const { command, args } = req.query;
+    tlClient.tl[command](...JSON.parse(args), (data) => {
+        res.send({data});
+    })
+})
 // --> commented out models
 // const getUTXOsForManyTxns = async (txnDataArray, omniClient, next)=>{
 //     let allUTXOs = []

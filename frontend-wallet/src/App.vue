@@ -125,11 +125,11 @@ export default {
   mounted() {
     // TODO: run this whenever addresses change
     // socketService.registerAddresses(this.publicAddresses);
-    socketService.ping();
+    // socketService.ping();
 
-    socketService.socket.on("requestAddresses", () => {
-      socketService.registerAddresses(this.publicAddresses);
-    });
+    // socketService.socket.on("requestAddresses", () => {
+    //   socketService.registerAddresses(this.publicAddresses);
+    // });
     window.toggleWallet = this.toggleWallet;
   },
   computed: {

@@ -33,13 +33,14 @@ var datadir = config.TLDATADIR
 var morgan = require('morgan')
 // var store_dir = datadir + '/sessions/'
 const handleIoConnection = require('./sockets/index.js');
+const handleIoConnection_simple = require('./sockets/simple');
 const { getInfo } = require('./scripts/getInfo');
 const { findNewBlockTask } = require('./jobs');
 const { redisClient } = require('./redis_client');
 
 app.use(cors())
 //SOCKET IO
-io.on('connection', handleIoConnection)
+io.on('connection', handleIoConnection_simple)
 
 //UDP server
 udpserver.on('error', (err) => {
