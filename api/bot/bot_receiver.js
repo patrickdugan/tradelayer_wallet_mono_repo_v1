@@ -6,7 +6,7 @@ const PORT = 9876
 
 const options = {
     address: 'QbbqvDj2bJkeZAu4yWBuQejDd86bWHtbXh', // string
-    propertyId: 8, // number
+    propertyId: 4, // number
     amount: '0.1' // string
 }
 
@@ -44,7 +44,9 @@ class Receiver {
             const { listenerParams } = buildRawTxData
             const unspentArray = buildRawTxData.listunspent
             console.log(`Start Building rawTx from unspents: ${unspentArray.length}`)
-            this.buildTokenToTokenTrade(unspentArray, this.propertyId, this.amount, listenerParams.propertyId, listenerParams.amount, true, (rawTx) => {
+            this.buildTokenToTokenTrade(unspentArray, this.propertyId, this.amount, listenerParams.propertyId, listenerParams.amount, true, (res) => {
+                if(res.error) return console.log(res.error);
+                const rawTx = res.data
                 console.log(`Builded rawTx: ${rawTx}`)
                 if (!rawTx) return console.error('Can not Build RawTX')
                 this.signRawTx(rawTx)
@@ -67,7 +69,7 @@ class Receiver {
 
     validateAddress(address) {
         tl.validateAddress(address, (d) => {
-            this.receiverChannelPubKey = d.pubkey
+            this.receiverChannelPubKey = d.data.pubkey
             console.log(`Address Validation:`, d)
             if (d) {
                 this.io.emit('channelPubKey', this.receiverChannelPubKey)
@@ -94,7 +96,6 @@ class Receiver {
     }
 
     buildTokenToTokenTrade(inputs, id1, amount1, id2, amount2, secondSigner = true, cb) {
-
         tl.getBlock(null, (block) => {
             if (!block) return console.error('Can not get block')
             const height = block.height + 3
@@ -102,7 +103,12 @@ class Receiver {
             tl.createpayload_instant_trade(id1, amount1, id2, amount2, height, (payload) => {
                 if (!payload) return console.error('Cant create Payload!')
                 //set refAddress to null to skip adding reffaddress
-                tl.buildRawAsync(inputs, payload, null, (rawTx) => {
+                const buildOptions = {
+                    txid: inputs[0].txid,
+                    vout: inputs[0].vout,
+                    payload,
+                }
+                tl.buildRawAsync(buildOptions, (rawTx) => {
                     if (!rawTx) return console.error('Cant build RawTx')
                     cb(rawTx)
                 })
@@ -112,7 +118,9 @@ class Receiver {
 
     signRawTx(rawTx) {
         console.log(`Start Signing rawTx`)
-        tl.simpleSign(rawTx, (signedTx) => {
+        tl.simpleSign(rawTx, (res) => {
+            if (res.error) return console.log(res.error);
+            const signedTx = res.data
             if (!signedTx.complete) return console.error("Fail with signing the rawTX")
             const { hex } = signedTx
             console.log(`Signed RawTX: ${ hex }`)

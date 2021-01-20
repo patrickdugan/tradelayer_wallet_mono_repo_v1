@@ -4,7 +4,7 @@ const tl = require('./TradeLayerRPCAPI').tl
 
 const options = {
     address: 'QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8', // string
-    propertyId: 7, // number
+    propertyId: 5, // number
     amount: '0.1' // string
 }
 
@@ -20,7 +20,6 @@ class Listener {
             console.log(`New Connection! ID: ${io.id}`)
             this.io = io;
             this.getNewAddress()
-            
             this.io.on('channelPubKey', (channelPubKey) => {
                 console.log('Receive second channelPubKey!')
                 this.receiverChannelPubKey = channelPubKey
@@ -49,7 +48,7 @@ class Listener {
 
     validateAddress(address) {
         tl.validateAddress(address, (d) => {
-            this.listenerChannelPubKey = d.pubkey
+            this.listenerChannelPubKey = d.data.pubkey
             console.log(`Address Validation:`, d)
             if (d) {
                 this.io.emit('channelPubKey', this.listenerChannelPubKey)
@@ -97,7 +96,9 @@ class Listener {
 
     signRawTx(rawTx) {
         console.log(`Start co Signing rawTx`)
-        tl.simpleSign(rawTx, (signedTx) => {
+        tl.simpleSign(rawTx, (res) => {
+            if(res.error) return console.log(res.error);
+            const signedTx = res.data;
             if (!signedTx.complete) return console.error("Fail with signing the rawTX")
             const { hex } = signedTx
             if (!hex) return console.erreor("Fail with signing the rawTX")
@@ -107,7 +108,10 @@ class Listener {
     }
 
     sendRawTx(hex) {
-        tl.sendRawTransaction(hex, (data) => {
+        tl.sendRawTransaction(hex, (res) => {
+            const { data, error } = res;
+            if (error) return console.log(error);
+            console.log(data)
             if(!data) return console.erreor("Fail with sending the rawTX")
             console.log(`Successfull!`)
             console.log(`Transaction created: ${data}`)
