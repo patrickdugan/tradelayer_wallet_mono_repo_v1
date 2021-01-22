@@ -7,7 +7,7 @@ socket.on("connect", () => {
 
 socket.on("listeners-list", (listenersList) => {
   console.log(`Listeners list Received`)
-  initNewReceiver(listenersList[0], {});
+  window.listenersList = listenersList
 })
 
 const initNewReceiver = (listenerURL, options) => {

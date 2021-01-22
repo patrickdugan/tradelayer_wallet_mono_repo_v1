@@ -1,3 +1,5 @@
+const fs = require('fs'); // reqire fileSystem node module
+
 const tl = require('./TradeLayerRPCAPI').tl 
 const PORT = 9876
 var listener = require('socket.io')(PORT, {
@@ -6,22 +8,22 @@ var listener = require('socket.io')(PORT, {
 	  methods: ["GET", "POST"]
 	}
   });
-
 class Listener {
     constructor() {
         this.address = 'QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8'
-        this.propertyId = 5;
-        this.amount = '0.02'
         this.init();
     }
 
     init() {
         listener.on('connection', (client) => {
+            this.log = {}
+            this.log.start = new Date();
             this.client = client
+            this.log.listenerAdress = this.address;
             console.log(`New Connection: ${client.id}`)
             
             client.on('requestTrade', (tradeOptions) => {
-               const isGood = checkIfItsGoodDeal(tradeOptions);
+               const isGood = this.checkIfItsGoodDeal(tradeOptions);
                isGood ?  this.createNewAddress() : this.rejectTheTrade();
             })
 
@@ -48,8 +50,16 @@ class Listener {
             if (error) return console.log(error.message);
             if(!data) return console.erreor("Fail with sending the rawTX")
             if (data) {
+                this.log.end = new Date();
+                this.log.result = data;
+                this.log.duration = Math.abs(this.log.end - this.log.start);
+                fs.appendFile("./socket.log", JSON.stringify(this.log, null, '\t'), function(err) {
+                    if(err) return console.log(err.message);
+                    console.log("The log was saved!");
+                });
                 this.client.emit('success', data)
                 console.log(`Transaction created: ${data}`)
+                console.log(this.log);
             }
         })
     }
@@ -133,12 +143,15 @@ class Listener {
         console.log(`Rejecting the trade!`)
         this.client.emit('tradeRejection', "Rejecting the Trade!")
     }
+
+    checkIfItsGoodDeal(tradeOptions) {
+        this.log.trade = tradeOptions
+        console.log(tradeOptions)
+        this.propertyId = tradeOptions.tokenId_wanted;
+        this.amount = tradeOptions.amount_wanted
+        return true;
+    }
 }
 
 const address = 'QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8';
 new Listener();
-
-function checkIfItsGoodDeal() {
-    //check logic
-    return true;
-}

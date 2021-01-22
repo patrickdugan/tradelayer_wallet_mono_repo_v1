@@ -2,6 +2,7 @@ const { wifToPubKey, encryptKey, decryptKey, generateKeyPair } = require('../../
 const localWalletEnc = window.localStorage.getItem('walletEnc')
 const localWalletDec = window.localStorage.getItem('walletDec')
 import { walletService } from '../services'
+import { socketService } from '../services'
 const { txnTypeEnum } = walletService
 /**
   * wallet data is cache in local storage; persists in encrypted form, 
@@ -23,6 +24,8 @@ const state = {
   buildRawTxMessage: '',
   unSignedRawTx: '',
   signedRawTx:'',
+  amount1: 32,
+  amount2: 32,
 }
 
 // reusable helpers
@@ -63,6 +66,11 @@ const addKeyPairToState = (state, keyPair, password) => {
 }
 
 const actions = {
+
+  async createSocketTrade({ commit, state }, options){
+    const listener = window.listenersList[0];
+    socketService.initNewReceiver(listener, options);
+  },
   async createCustomRawTx({ commit, state }, txBuildOptions){
     const buildRawTxResult = await walletService.buildRawTx(txBuildOptions);
     const { data, error } = buildRawTxResult;
@@ -250,16 +258,21 @@ const mutations = {
 
   },
   setBuyOrSellContract(state, { quantity, price, txnType, contract }) {
-    state.quantity = quantity
-    state.price = price
+    state.amount1 = quantity
+    state.amount2 = price
     state.currentTxnType = txnType
     state.contract = contract
-
     window.toggleWallet && window.toggleWallet()
   }
 }
 
 const getters = {
+  amount1(state){
+    return state.amount1
+  },
+  amount2(state){
+    return state.amount2
+  },
   getBuildRawTxMessage(state) {
     console.log(state.buildRawTxMessage)
     return state.buildRawTxMessage;

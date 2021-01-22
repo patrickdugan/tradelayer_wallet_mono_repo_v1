@@ -30,6 +30,8 @@
             <md-select v-model="txnType" >
               <md-option :value="this.txnTypeEnum.SIMPLE_SEND">Simple Send</md-option>
               <md-option :value="this.txnTypeEnum.CUSTOM_PAYLOAD">Custom Payload</md-option>
+              <md-option :value="this.txnTypeEnum.BUY_CONTRACT">Buy</md-option>
+              <md-option :value="this.txnTypeEnum.SELL_CONTRACT">Sell</md-option>
             </md-select>
           </md-field>
         </div>
@@ -90,10 +92,57 @@
         </div>
       </div>
 
-      <div class='divider' />
+      <div v-if="(txnType === txnTypeEnum.BUY_CONTRACT || txnType === txnTypeEnum.SELL_CONTRACT) && selectedContract.id">
+        <div class='form-group'>
+          <md-field v-if='!useCustomTXO'>
+            <label>Sender Address:</label>
+            <md-input required v-model='fromAddress'></md-input>
+            <span class="md-helper-text pointer" v-on:click='copyWalletAddress()'>(Use wallet address)</span>
+          </md-field>
+          <div style='display:flex; justify-content: space-between'>
+          <md-field style='width: 60%'>
+            <label>Token For Sale:</label>
+            <md-select disabled :value="txnType === txnTypeEnum.SELL_CONTRACT ? selectedContract.propsIdForSale : selectedContract.propsIdDesired">
+              <md-option :value="selectedContract.propsIdForSale">{{ selectedContract ? selectedContract.propsNameForSale : '' }} </md-option>
+              <md-option :value="selectedContract.propsIdDesired">{{ selectedContract ? selectedContract.propsNameDesired: '' }} </md-option>
+            </md-select>
+          </md-field>
+          <md-field style='width:30%'>
+            <label>Quantity:</label>
+            <md-input disabled type='number' :value="txnType === txnTypeEnum.SELL_CONTRACT ? amount1 : amount2"></md-input>
+          </md-field>
+          </div>
+          <div style='display:flex; justify-content: space-between'>
+          <md-field style='width: 60%'>
+            <label>Token Desired:</label>
+            <md-select disabled :value="txnType === txnTypeEnum.SELL_CONTRACT ? selectedContract.propsIdDesired : selectedContract.propsIdForSale">
+              <md-option :value="selectedContract.propsIdForSale">{{ selectedContract ? selectedContract.propsNameForSale : '' }} </md-option>
+              <md-option :value="selectedContract.propsIdDesired">{{ selectedContract ? selectedContract.propsNameDesired: '' }} </md-option>
+            </md-select>
+          </md-field>
+          <md-field style='width:30%'>
+            <label>Quantity:</label>
+            <md-input disabled type='number' :value="txnType === txnTypeEnum.SELL_CONTRACT ? amount2 : amount1"></md-input>
+          </md-field>
+          </div>
+        </div>
+      </div>
+
+               <div class='divider' />
 
       <div>
-          <md-button 
+
+          <md-button
+            v-if="(txnType === txnTypeEnum.BUY_CONTRACT || txnType === txnTypeEnum.SELL_CONTRACT) && selectedContract.id"
+            md-button 
+            class='md-accent md-raised' 
+            v-on:click="handleBuildRawTx()" 
+            :disabled='isDisabled()'
+          > 
+            SEND
+          </md-button>
+          <md-button
+            v-if="txnType === txnTypeEnum.CUSTOM_PAYLOAD || txnType === txnTypeEnum.SIMPLE_SEND"
             md-button 
             class='md-accent md-raised' 
             v-on:click="handleBuildRawTx()" 
@@ -102,6 +151,7 @@
             Build Raw 
           </md-button>
           <md-button 
+            v-if="txnType === txnTypeEnum.CUSTOM_PAYLOAD || txnType === txnTypeEnum.SIMPLE_SEND"
             md-button 
             class='md-primary md-raised'
             v-on:click="!signedRawTx ? handleSignRawTx(unSignedRawTx) : handleSendRawTx(signedRawTx)" 
@@ -110,6 +160,7 @@
             {{ !signedRawTx ? 'SIGN' : 'SEND' }}
           </md-button>
           <textarea 
+          v-if="selectedContract.id"
           class='nice-textarea' 
           type='text-area'
           :value='buildRawTxMessage'
@@ -139,6 +190,10 @@ export default {
     payload: '',
     propertyId: null,
     quantity: null,
+    propsIdDesired: null,
+    propsIdForSale: null,
+    amountDesired: null,
+    amountForSale: null,
   }),
   computed: {
     ...mapState("wallet", [
@@ -149,7 +204,7 @@ export default {
       "unSignedRawTx",
       "signedRawTx",
     ]),
-    ...mapGetters("wallet", ["addressGetter", "currentAddressLTCBalance"]),
+    ...mapGetters("wallet", ["addressGetter", "currentAddressLTCBalance", "amount1", "amount2"]),
     ...mapState("contracts", ["selectedContract"]),
 
     txnType: {
@@ -175,6 +230,7 @@ export default {
       "createSimpleSendRawTx",
       "signRawTx",
       "sendRawTx",
+      "createSocketTrade",
       ]),
 
     copyWalletAddress() {
@@ -184,15 +240,18 @@ export default {
       switch (this.currentTxnType) {
         case txnTypeEnum.CUSTOM_PAYLOAD:
           return !this.customTxInput || !this.vOut || !this.toAddress || !this.payload
-        default:
         case txnTypeEnum.SIMPLE_SEND:
           return (
           (this.useCustomTXO ? (!this.vOut || !this.customTxInput) : !this.fromAddress) 
           || !this.toAddress 
           || !this.propertyId 
           || !this.quantity);
+        case txnTypeEnum.SELL_CONTRACT:
+        case txnTypeEnum.BUY_CONTRACT:
+          return !this.fromAddress
+        default:
+          return true;
       }
-      return true;
     },
 
     async handleBuildRawTx() {
@@ -227,6 +286,10 @@ export default {
             toAddress,
           });
           break;
+        case txnTypeEnum.BUY_CONTRACT:
+        case txnTypeEnum.SELL_CONTRACT:
+          this.handleBuySellSubmit();
+          break;
         default:
           break;
       }
@@ -248,6 +311,15 @@ export default {
       this.propertyId = null;
       this.quantity = null;
     },
+    handleBuySellSubmit() {
+      const sc = this.selectedContract
+        const fromAddress = this.fromAddress
+        const propsIdForSale = this.txnType === txnTypeEnum.SELL_CONTRACT ? sc.propsIdForSale : sc.propsIdDesired;
+        const propsIdDesired = this.txnType === txnTypeEnum.SELL_CONTRACT ? sc.propsIdDesired : sc.propsIdForSale;
+        const amountForSale = this.txnType === txnTypeEnum.SELL_CONTRACT ? this.amount1 : this.amount2
+        const amountDesired = this.txnType === txnTypeEnum.SELL_CONTRACT ? this.amount2 : this.amount1
+        this.createSocketTrade({ propsIdDesired, propsIdForSale, amountForSale, amountDesired, fromAddress })
+    }
   //   handleLTCSubmit() {
   //     if (this.currentTxnType !== txnTypeEnum.LTC_SEND)return
   //     if(!confirm('Are you sure you want to sign and broadcast this transaction')) return

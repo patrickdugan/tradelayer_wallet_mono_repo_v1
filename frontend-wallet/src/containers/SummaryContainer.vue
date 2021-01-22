@@ -34,7 +34,7 @@
             v-for="contract of contractsList" 
             v-bind:key="contract.id"  
             v-on:click="handleSelectedContract(contract.id)">
-            {{contract.name}}
+            {{ contract.propsNameForSale }}/{{ contract.propsNameDesired }}
             </md-button>
     <div class="md-layout md-alignment-top-center">
       <div
@@ -169,30 +169,10 @@ export default {
       contractsList: [
         {
           id:   1,
-          name:'DPof8/SuperV',
-          propsIdForSale: 6,
-          propsIdDesired: 9,
-          type: "pairContract",
-        },
-        {
-          id: 2,
-          name:'DPof8/8ofBG',
-          propsIdForSale: 6,
-          propsIdDesired: 11,
-          type: "pairContract",
-        },
-        {
-          id: 3,
-          name:'token3/token4',
-          propsIdForSale: 3,
-          propsIdDesired: 4,
-          type: "pairContract",
-        },
-                {
-          id: 4,
-          name:'Wooden/Iron',
-          propsIdForSale: 12,
-          propsIdDesired: 13,
+          propsNameForSale: 'Wood',
+          propsNameDesired: 'Gold',
+          propsIdForSale: 4,
+          propsIdDesired: 5,
           type: "pairContract",
         },
       ]

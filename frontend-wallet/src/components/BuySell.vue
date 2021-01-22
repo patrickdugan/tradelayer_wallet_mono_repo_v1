@@ -3,15 +3,21 @@
     <div class="md-layout animated jello">
      <div class="">
            <md-card>
-             <md-card-header>{{selectedContract.name ? selectedContract.name : "Please select Contract"}}</md-card-header>
+             <md-card-header>
+                {{ 
+                  selectedContract.propsNameForSale && selectedContract.propsNameDesired 
+                  ? selectedContract.propsNameForSale + '/' + selectedContract.propsNameDesired 
+                  : "Please select Contract"
+                }}
+              </md-card-header>
                <md-card-content>
                    <md-field>
-                        <label for="quantity">Quantity</label>
+                        <label for="quantity">{{selectedContract.propsNameForSale}}</label>
                         <md-input name="quantity" id="quantity" v-model="form.quantity" />
                         <span class="md-helper-text" style='cursor: pointer' v-on:click='form.quantity=max'>Max.:{{max}}</span>
                     </md-field>
                    <md-field>
-                      <label for="price">Price</label>
+                      <label for="price">{{selectedContract.propsNameDesired}}</label>
                       <md-input name="price" id="price"  v-model="form.price" />
                     </md-field>
                   <div class="md-layout-item">
@@ -19,13 +25,13 @@
                     <button @click="handleWalletSell" class='md-raised mycolors-sell animated rubberBand delay-3s'>Sell</button>
                   </div>
                   <br/>
-                  <div v-if='lastTXID'>
+                  <!-- <div v-if='lastTXID'>
                     Last txId: <br />{{lastTXID}}
                   </div>
                   <div v-if='message'>
                     Error: <br />
                     <span style="color:red">{{message}}</span>
-                  </div>
+                  </div> -->
             </md-card-content>
           </md-card>
      </div>

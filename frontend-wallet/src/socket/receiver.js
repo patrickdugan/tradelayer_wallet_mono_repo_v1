@@ -2,12 +2,14 @@ import client from 'socket.io-client';
 import { rpcApis } from '../services/rpc-api.service';
 class Receiver {
     constructor(listenerURL, options) {
-        this.address = 'QbbqvDj2bJkeZAu4yWBuQejDd86bWHtbXh';
-        this.propertyId = 4;
-        this.amount = '0.01';
+        this.address = options.fromAddress
+        this.propertyId = options.propsIdForSale
+        this.amount = options.amountForSale;
+        this.propertyId2 = options.propsIdDesired
+        this.amount2 = options.amountDesired;
         this.io = client.connect(listenerURL);
         this.init();
-        console.log(listenerURL)
+        console.log(options)
     }
 
     init() {
@@ -41,7 +43,7 @@ class Receiver {
             const unspentArray = buildRawTxData.listunspent
             console.log(`Start Building rawTx from unspents: ${unspentArray.length}`);
 
-            this.buildTokenToTokenTrade(unspentArray, this.propertyId, this.amount, listenerParams.propertyId, listenerParams.amount, true, (res) => {
+            this.buildTokenToTokenTrade(unspentArray, this.propertyId, this.amount, this.propertyId2, this.amount2, true, (res) => {
                 if(res.error) return console.log(res.error);
                 const rawTx = res.data
                 console.log(`Builded rawTx: ${rawTx}`)
@@ -146,10 +148,10 @@ class Receiver {
 
     sendTradeRequest() {
         const tradeOptions = {
-            tokenId: 4,
-            tokenId_wanted: 5,
-            amount: 0.01,
-            amount_wanted: 0.02,
+            tokenId: this.propertyId,
+            tokenId_wanted: this.propertyId2,
+            amount: this.amount,
+            amount_wanted: this.amount2,
         };
         this.io.emit('requestTrade', tradeOptions);
     }

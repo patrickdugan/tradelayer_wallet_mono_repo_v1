@@ -1,0 +1,121 @@
+{
+	"start": "2021-01-22T16:04:00.575Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "6",
+		"amount_wanted": "9"
+	},
+	"end": "2021-01-22T16:04:01.128Z",
+	"result": "db8c9fea097111c3c05639b0133327cc568cd6598b3d78a3e3906d199f9ebf34",
+	"duration": 553
+}{
+	"start": "2021-01-22T16:04:21.251Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "58",
+		"amount_wanted": "9"
+	},
+	"end": "2021-01-22T16:04:21.762Z",
+	"result": "445b3c3393775feac31009051705b5f546ba6632e75c97ba993ddf4e599a4c70",
+	"duration": 511
+}{
+	"start": "2021-01-22T16:04:24.019Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "58",
+		"amount_wanted": "9"
+	},
+	"end": "2021-01-22T16:04:24.525Z",
+	"result": "9719971506f47aaf261ffab321a6c32a2a1565f2149e2cd0288a8500adeb373d",
+	"duration": 506
+}{
+	"start": "2021-01-22T16:04:25.304Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "58",
+		"amount_wanted": "9"
+	},
+	"end": "2021-01-22T16:04:25.821Z",
+	"result": "362279803c6b19cdc971bd63be240608d1a5a4b91bdd7e2e8ee2c3f28b6d220e",
+	"duration": 517
+}{
+	"start": "2021-01-22T16:04:26.455Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "58",
+		"amount_wanted": "9"
+	},
+	"end": "2021-01-22T16:04:26.946Z",
+	"result": "ce14b633ca92fb3a0a6efd6f486536b265a725c46d76780b0c64405f8c24b583",
+	"duration": 491
+}{
+	"start": "2021-01-22T16:04:27.590Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "58",
+		"amount_wanted": "9"
+	},
+	"end": "2021-01-22T16:04:28.102Z",
+	"result": "1c195627fd3d022a26acf7bb4dbfc1f9f90e281861117e5cdeaaebdf1b874620",
+	"duration": 512
+}{
+	"start": "2021-01-22T16:04:28.758Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "58",
+		"amount_wanted": "9"
+	},
+	"end": "2021-01-22T16:04:29.267Z",
+	"result": "46995c0688364fb0056d1db51f146f858cbdf50c9c7ae389e8c32308a3d8240b",
+	"duration": 509
+}{
+	"start": "2021-01-22T16:04:52.050Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "58",
+		"amount_wanted": "8"
+	},
+	"end": "2021-01-22T16:04:52.866Z",
+	"result": "a2cd8cd0c85332eb8d0d4a20820dbb93102745b3a254df4837e7129c3baa734a",
+	"duration": 816
+}{
+	"start": "2021-01-22T16:04:57.591Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "58",
+		"amount_wanted": "8"
+	},
+	"end": "2021-01-22T16:04:58.209Z",
+	"result": "a6abb7b3ab6d7dec4bf318a5687e51aaad737ecff08e7059b9914f446ee8ea4f",
+	"duration": 618
+}{
+	"start": "2021-01-22T16:06:05.588Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 5,
+		"tokenId_wanted": 4,
+		"amount": "2",
+		"amount_wanted": "5"
+	},
+	"end": "2021-01-22T16:06:06.129Z",
+	"result": "0477a4428f31dc8dca2b8c74c04073f24e323f58850bd9d0559b241686050460",
+	"duration": 541
+}
