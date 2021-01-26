@@ -366,11 +366,10 @@ tl.getWithdrawals = function(senderAddress){
     }) 
 }
 
-tl.getChannelInfo = function(channelAddress){
-    client.cmd("tl_getchannel_info", channelAddress,function(err, data, resHeaders){
-        if (err) return console.log(err);
- 
-        return cb(data)
+tl.getChannelInfo = function(channelAddress, cb){
+    client.cmd("tl_getchannel_info", channelAddress, (err, data, resHeaders) =>{
+        if (err) return cb({error: err.message})
+        return cb({data})
     })
 }
 

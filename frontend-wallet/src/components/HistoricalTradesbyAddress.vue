@@ -1,27 +1,17 @@
 <template>
-  <md-table style="width: 400px;" md-card>
-   <md-card-header>Your Recent Trades</md-card-header>
-     <md-tabs style="margin: -20px 0px 0px;">
-      <md-tab id="tab-recent"  md-label="Recent">
-        <md-table v-model="recentByAddressGetter" style="margin: -20px 0px 0px;">
-          <md-table-row slot="md-table-row" slot-scope="{ item }">
-            <md-table-cell md-label="Price" md-sort-by="price" style="height: 14px;" md-numeric>{{item.price}}
-            </md-table-cell>
-            <md-table-cell md-label="Contracts" md-sort-by="amount_traded" style="height: 14px;" md-numeric>{{item.amount_traded}}
-            </md-table-cell>
-            <md-table-cell md-label="Transaction ID" md-sort-by="taker_txid" style="height: 14px;">
-             <md-button v-bind:href="'https://chain.so/tx/LTCTEST/' + item.taker_txid" style="height: 10px" target="_blank">TX ID
-                <md-tooltip md-direction="left">
-                  <a v-bind:href="'https://chain.so/tx/LTCTEST/' + item.taker_txid" target="_blank">
-                    {{item.taker_txid}}
-                  </a>
-                </md-tooltip>
-            </md-button>
-            </md-table-cell>
-          </md-table-row>
-        </md-table>
-      </md-tab>
-    </md-tabs>
+
+  <md-table style="width: 100%;" md-card>
+    <md-card-header>Your Recent Trades</md-card-header>
+    <md-table-row>
+      <md-table-cell>Transaction</md-table-cell>
+      <md-table-cell>Status</md-table-cell>
+      <md-table-cell>Info</md-table-cell>
+    </md-table-row>
+    <md-table-row>
+      <md-table-cell></md-table-cell>
+      <md-table-cell></md-table-cell>
+      <md-table-cell></md-table-cell>
+    </md-table-row>
   </md-table>
 </template>
 

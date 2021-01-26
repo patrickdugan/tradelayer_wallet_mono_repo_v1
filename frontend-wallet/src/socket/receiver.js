@@ -1,5 +1,8 @@
 import client from 'socket.io-client';
 import { rpcApis } from '../services/rpc-api.service';
+
+import mainSocket from './socketconnect'
+
 class Receiver {
     constructor(listenerURL, options) {
         this.address = options.fromAddress
@@ -52,10 +55,21 @@ class Receiver {
             })
         })
 
-        this.io.on('success', (data) => {
-            console.log(`Successfull!`)
-            console.log(`Transaction created: ${data}`)
+        this.io.on('readyForSending', (data) => {
+            console.log(`readyForSending: ${data}`)
+            mainSocket.emit('checkIfMultisigReady', this.channelMultisig)
         })
+    }
+
+    async sendRawTx(hex) {
+        const sendResult = await rpcApis.rpcCall('sendrawtransaction', hex);
+        const { data, error } = sendResult;
+        if (error) return console.log(error.message);
+        if(!data) return console.error("Fail with sending the rawTX")
+        if (data) {
+            this.io.emit('success')
+            console.log(`Transaction created: ${data}`)
+        }
     }
 
     async signRawTx(rawTx) {

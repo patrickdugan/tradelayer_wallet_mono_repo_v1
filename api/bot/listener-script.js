@@ -41,27 +41,23 @@ class Listener {
                 console.log(`Receiving signedRawTx`)
                 this.signRawTx(signedRawTx)
             })
+
+            this.client.on('success', (data) => {
+                this.saveTheLog();
+                console.log(`Transaction created: ${data}`)
+            })
         })
     }
 
-    sendRawTx(hex) {
-        tl.sendRawTransaction(hex, (res) => {
-            const { data, error } = res;
-            if (error) return console.log(error.message);
-            if(!data) return console.erreor("Fail with sending the rawTX")
-            if (data) {
-                this.log.end = new Date();
-                this.log.result = data;
-                this.log.duration = Math.abs(this.log.end - this.log.start);
-                fs.appendFile("./socket.log", JSON.stringify(this.log, null, '\t'), function(err) {
-                    if(err) return console.log(err.message);
-                    console.log("The log was saved!");
-                });
-                this.client.emit('success', data)
-                console.log(`Transaction created: ${data}`)
-                console.log(this.log);
-            }
-        })
+    saveTheLog() {
+        this.log.end = new Date();
+        this.log.result = data;
+        this.log.duration = Math.abs(this.log.end - this.log.start);
+        console.log(this.log);
+        fs.appendFile("./socket.log", JSON.stringify(this.log, null, '\t'), function(err) {
+            if(err) return console.log(err.message);
+            console.log("The log was saved!");
+        });
     }
 
     signRawTx(rawTx) {
@@ -73,7 +69,7 @@ class Listener {
             const { hex } = data
             if (!hex) return console.erreor("Fail with signing the rawTX")
             console.log(`coSigned RawTX: ${ hex }`)
-            this.sendRawTx(hex)
+            this.client.emit('readyForSending', hex);
         })
     }
 
