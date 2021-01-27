@@ -179,8 +179,9 @@ tl.getBlock = function(hash, cb){
 }
 
 tl.sendRawTransaction = (tx, cb) => {
+  console.log(tx)
   client.cmd("sendrawtransaction", tx, (error, data, resHeaders) => {
-    if (error) return cb({error})
+    if (error) return console.log(error)
     cb({data})
   });
 }
@@ -536,7 +537,7 @@ tl.publishOracleData = function(fromaddress, title, high, low, close, cb){
 
 tl.commitToChannel = function(sendingAddress,channelAddress,propertyid,amount, cb){
       client.cmd('tl_commit_tochannel',sendingAddress,channelAddress,propertyid,amount, (error, data, resHeaders) => {
-        if (error) return cb({error});
+        if (error) return cb({error: error.message})
         cb({data});
       })
 }

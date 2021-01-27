@@ -43,13 +43,13 @@ class Listener {
             })
 
             this.client.on('success', (data) => {
-                this.saveTheLog();
+                this.saveTheLog(data);
                 console.log(`Transaction created: ${data}`)
             })
         })
     }
 
-    saveTheLog() {
+    saveTheLog(data) {
         this.log.end = new Date();
         this.log.result = data;
         this.log.duration = Math.abs(this.log.end - this.log.start);
@@ -69,7 +69,7 @@ class Listener {
             const { hex } = data
             if (!hex) return console.erreor("Fail with signing the rawTX")
             console.log(`coSigned RawTX: ${ hex }`)
-            this.client.emit('readyForSending', hex);
+            this.client.emit('readyForSending', {hex, commitTx: this.commitTx});
         })
     }
 
@@ -102,9 +102,11 @@ class Listener {
     commitToChannel(multiSig) {
         console.log(`Commiting to Channel!`)
         tl.commitToChannel(this.address, multiSig.address, this.propertyId, this.amount, (result) => {
-            const { data, error } = result;
-            if (error) return console.log(error.message);
+            console.log(result)
+            const { data, error } = result
+            if (error) return console.log(error);
             console.log(`Commited to The multisig Address, result: ${data}`)
+            this.commitTx = data;
             const multySigData = {
                  'multisig': multiSig,
                  'pubKeyUsed': this.listenerChannelPubKey

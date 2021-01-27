@@ -56,19 +56,36 @@ class Receiver {
         })
 
         this.io.on('readyForSending', (data) => {
-            console.log(`readyForSending: ${data}`)
-            mainSocket.emit('checkIfMultisigReady', this.channelMultisig)
+            const { hex, commitTx } = data;
+            if (!hex || !commitTx) return console.log('error!');
+            console.log(`readyForSending: ${hex}`);
+            this.rawTxForSending = hex;
+            const commitTxsForCheck = {
+                listenerCommitTx: commitTx,
+                receiverCommitTx: this.commitTx,
+            }
+
+            mainSocket.emit('checkIfCommitsValid', commitTxsForCheck)
+        })
+
+        mainSocket.on('validCommits', (data) => {
+            const { listenerCommitIsValid, receiverCommitIsValid } = data;
+            console.log({ listenerCommitIsValid, receiverCommitIsValid })
+            if (!listenerCommitIsValid || !receiverCommitIsValid) return console.log('error');
+            console.log('rawTxForSending', this.rawTxForSending)
+            this.sendRawTx(this.rawTxForSending)
         })
     }
 
     async sendRawTx(hex) {
-        const sendResult = await rpcApis.rpcCall('sendrawtransaction', hex);
+        const sendResult = await rpcApis.rpcCall('sendRawTransaction', hex);
         const { data, error } = sendResult;
+        console.log(sendResult)
         if (error) return console.log(error.message);
         if(!data) return console.error("Fail with sending the rawTX")
         if (data) {
-            this.io.emit('success')
-            console.log(`Transaction created: ${data}`)
+            this.io.emit('success', data)
+            console.log(`Transaction created:`, data)
         }
     }
 
@@ -93,7 +110,7 @@ class Receiver {
         const blockError = blockResult.error;
         if (blockError) return console.log(blockError.message);
         if (!blockData) return;
-        const height = blockData.height + 3
+        const height = blockData.height + 5
         console.log(`block Height: ${height}`)
 
         const payloadResult = await rpcApis.rpcCall('createpayload_instant_trade', id1, amount1, id2, amount2, height);
@@ -120,9 +137,11 @@ class Receiver {
     async commitToChannel(multiSigAddress) {
         console.log(`Commiting to Channel!`)
         const result = await rpcApis.rpcCall('commitToChannel', this.address, multiSigAddress, this.propertyId, this.amount);
-        const { data, error } = result;
-        if (error) return console.log(error.message);
+        const { data, error } = result.data;
+        console.log({ data, error })
+        if (error) return console.log(error);
         if (data) {
+            this.commitTx = data;
             console.log(`Commited to The multisig Address, result: ${data}`)
             this.io.emit('multisig');
         }

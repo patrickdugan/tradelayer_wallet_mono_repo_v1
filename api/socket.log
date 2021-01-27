@@ -118,4 +118,88 @@
 	"end": "2021-01-22T16:06:06.129Z",
 	"result": "0477a4428f31dc8dca2b8c74c04073f24e323f58850bd9d0559b241686050460",
 	"duration": 541
+}{
+	"start": "2021-01-27T14:54:08.266Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "0.002",
+		"amount_wanted": "0.001"
+	},
+	"end": "2021-01-27T14:54:08.984Z",
+	"result": {
+		"data": "6dd8b3aad0201b7d3fcf5f9ab16efd8cd672996ecffa492ee38157e7bf1d1a86"
+	},
+	"duration": 718
+}{
+	"start": "2021-01-27T14:55:57.539Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 5,
+		"tokenId_wanted": 4,
+		"amount": "0.01",
+		"amount_wanted": "0.002"
+	},
+	"end": "2021-01-27T14:58:53.252Z",
+	"result": {
+		"data": "1a3f5fbeee7f91891f117c2cc84886c4250704467d8c8ad7e96026d14cf51669"
+	},
+	"duration": 175713
+}{
+	"start": "2021-01-27T15:03:35.482Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 5,
+		"tokenId_wanted": 4,
+		"amount": "0.01",
+		"amount_wanted": "0.002"
+	},
+	"end": "2021-01-27T15:07:26.302Z",
+	"result": {
+		"data": "f95eaea1285a66fa1f3900c36ca1ee77eb81466067f7578c24d73f8f127d2266"
+	},
+	"duration": 230820
+}{
+	"start": "2021-01-27T15:17:27.434Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "0.001",
+		"amount_wanted": "0.023"
+	},
+	"end": "2021-01-27T15:17:43.090Z",
+	"result": {
+		"data": "091a306475a638f2b49ad52ba394fe7fcf0ab848a6e4684dff498f0f67a4b5cf"
+	},
+	"duration": 15656
+}{
+	"start": "2021-01-27T15:28:38.972Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "0.001",
+		"amount_wanted": "0.023"
+	},
+	"end": "2021-01-27T15:31:39.940Z",
+	"result": {
+		"data": "52206fddb25781f35ecc51fe9352d83b80732cda38adb7c2ac05974e19052f40"
+	},
+	"duration": 180968
+}{
+	"start": "2021-01-27T15:45:20.165Z",
+	"listenerAdress": "QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8",
+	"trade": {
+		"tokenId": 4,
+		"tokenId_wanted": 5,
+		"amount": "0.001",
+		"amount_wanted": "0.023"
+	},
+	"end": "2021-01-27T15:46:46.107Z",
+	"result": {
+		"data": "417fc81c4695a90ca7f1bf6fa052478d866edd55aaaee47a970a9b24dcec566d"
+	},
+	"duration": 85942
 }
