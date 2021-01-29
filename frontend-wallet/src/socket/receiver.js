@@ -82,10 +82,11 @@ class Receiver {
         const { data, error } = sendResult;
         console.log(sendResult)
         if (error) return console.log(error.message);
-        if(!data) return console.error("Fail with sending the rawTX")
-        if (data) {
-            this.io.emit('success', data)
-            console.log(`Transaction created:`, data)
+        if(!data.data) return console.error("Fail with sending the rawTX")
+        if (data.data) {
+            this.io.emit('success', data.data)
+            console.log(`Transaction created:`, data.data)
+            mainSocket.emit('checkValidTlTx', data.data)
         }
     }
 
@@ -109,8 +110,10 @@ class Receiver {
         const blockData = blockResult.data;
         const blockError = blockResult.error;
         if (blockError) return console.log(blockError.message);
+        console.log(`old Height: ${blockData.height} `)
         if (!blockData) return;
         const height = blockData.height + 5
+        console.log(`new Height: ${height} `)
         console.log(`block Height: ${height}`)
 
         const payloadResult = await rpcApis.rpcCall('createpayload_instant_trade', id1, amount1, id2, amount2, height);

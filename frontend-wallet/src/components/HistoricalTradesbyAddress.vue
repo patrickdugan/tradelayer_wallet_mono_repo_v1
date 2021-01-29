@@ -3,14 +3,14 @@
   <md-table style="width: 100%;" md-card>
     <md-card-header>Your Recent Trades</md-card-header>
     <md-table-row>
-      <md-table-cell>Transaction</md-table-cell>
+      <md-table-cell>Raw TX</md-table-cell>
+      <md-table-cell>TradeLayer TX</md-table-cell>
       <md-table-cell>Status</md-table-cell>
-      <md-table-cell>Info</md-table-cell>
     </md-table-row>
-    <md-table-row>
-      <md-table-cell></md-table-cell>
-      <md-table-cell></md-table-cell>
-      <md-table-cell></md-table-cell>
+    <md-table-row  v-if='lastRawTx'>
+      <md-table-cell>{{lastRawTx ? `${lastRawTx.slice(0,8)}...${lastRawTx.slice(-8)}` : '' }}</md-table-cell>
+      <md-table-cell>{{ lastTlTx ? `${lastTlTx.slice(0,8)}...${lastTlTx.slice(-8)}` : 'Not yet created !' }}</md-table-cell>
+      <md-table-cell>{{ lastTxStatus }}</md-table-cell>
     </md-table-row>
   </md-table>
 </template>
@@ -31,7 +31,7 @@ export default {
     ...mapState('orderbook', ['recent']),
     ...mapGetters('contracts', ['transactionsGetter', 'selectedContractGetter']),
     ...mapGetters('orderbook', ['recentByAddressGetter']),
-    ...mapGetters('wallet', ['addressGetter'])
+    ...mapGetters('wallet', ['addressGetter', 'lastTxStatus', 'lastRawTx' , 'lastTlTx'])
   },
   mounted () {
     this.handleTrades()

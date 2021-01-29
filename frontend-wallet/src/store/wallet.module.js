@@ -3,6 +3,8 @@ const localWalletEnc = window.localStorage.getItem('walletEnc')
 const localWalletDec = window.localStorage.getItem('walletDec')
 import { walletService } from '../services'
 import { socketService } from '../services'
+import mainSocket from '../socket/socketconnect'
+
 const { txnTypeEnum } = walletService
 /**
   * wallet data is cache in local storage; persists in encrypted form, 
@@ -26,6 +28,9 @@ const state = {
   signedRawTx:'',
   amount1: 32,
   amount2: 32,
+  lastRawTx: '',
+  lastTlTx: '',
+  lastTxStatus: '',
 }
 
 // reusable helpers
@@ -69,7 +74,40 @@ const actions = {
 
   async createSocketTrade({ commit, state }, options){
     const listener = window.listenersList[0];
-    socketService.initNewReceiver(listener, options);
+    const myRec = socketService.initNewReceiver(listener, options);
+
+      myRec.io.on('readyForSending', (data) => {
+        const { hex } = data;
+        if (!hex) return;
+        commit('setLastRawTx', hex);
+        commit('setLastTlTx', '');
+        commit('setLastTxStatus', 'waiting for commits to be confirmed');
+      });
+
+      mainSocket.on('validCommits', (data) => {
+        const { listenerCommitIsValid, receiverCommitIsValid } = data;
+        if (!listenerCommitIsValid) {
+          commit('setLastTxStatus', 'Listener commit is not valid!');
+          return;
+        }
+
+        if (!receiverCommitIsValid) {
+          commit('setLastTxStatus', 'Receiver commit is not valid');
+          return;
+        }
+        commit('setLastTxStatus', 'Valid Commits!');
+      });
+
+      myRec.io.on('finalTx', (data) => {
+        console.log('finalTx');
+        commit('setLastTlTx', data);
+        commit('setLastTxStatus', 'waiting for Transaction to be confirmed');
+      })
+      mainSocket.on('validLastTx', (data) => {
+        if (!data) return commit('setLastTxStatus', 'Invalid!');
+        commit('setLastTxStatus', 'Valid !!');
+      })
+      
   },
   async createCustomRawTx({ commit, state }, txBuildOptions){
     const buildRawTxResult = await walletService.buildRawTx(txBuildOptions);
@@ -168,6 +206,18 @@ const actions = {
   }
 }
 const mutations = {
+  setLastTlTx(state, hex) {
+    state.lastTlTx = hex
+  },
+
+  setLastRawTx(state, hex) {
+    state.lastRawTx = hex
+  },
+
+  setLastTxStatus(state, status) {
+    state.lastTxStatus = status
+  },
+
   setSignedRawTx(state, tx) {
     state.signedRawTx = tx;
   },
@@ -267,6 +317,18 @@ const mutations = {
 }
 
 const getters = {
+  lastTlTx(state) {
+    return state.lastTlTx
+  },
+
+  lastRawTx(state) {
+    return state.lastRawTx
+  },
+
+  lastTxStatus(state) {
+    return state.lastTxStatus
+  },
+
   amount1(state){
     return state.amount1
   },

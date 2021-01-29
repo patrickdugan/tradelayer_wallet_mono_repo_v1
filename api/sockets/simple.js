@@ -24,6 +24,13 @@ const handleConnection = (client) => {
                 };
                 client.emit('validCommits', obj)
             })
+    });
+
+    client.on('checkValidTlTx', (data) => {
+        isTxValid(data)
+            .then((result) => {
+                client.emit('validLastTx', result);
+            })
     })
 }
 

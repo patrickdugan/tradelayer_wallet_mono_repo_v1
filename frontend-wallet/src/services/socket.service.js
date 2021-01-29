@@ -12,7 +12,7 @@ socket.on("listeners-list", (listenersList) => {
 
 const initNewReceiver = (listenerURL, options) => {
   console.log(`Init Connection with ${listenerURL}`);
-  new Receiver(listenerURL, options)
+  return new Receiver(listenerURL, options)
 };
 
 export const socketService = {

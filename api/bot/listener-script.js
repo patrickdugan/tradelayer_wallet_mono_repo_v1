@@ -44,6 +44,7 @@ class Listener {
 
             this.client.on('success', (data) => {
                 this.saveTheLog(data);
+                this.client.emit('finalTx', data);
                 console.log(`Transaction created: ${data}`)
             })
         })
