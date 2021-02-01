@@ -36,6 +36,11 @@ export default {
   mounted () {
     this.handleTrades()
   },
+  watch: {
+    lastTxStatus: function(m){
+      this.$toast.success(m);
+    },
+  },
   methods: {
     ...mapActions('orderbook', ['getRecentTrades', 'postRecentTradesbyAddress']),
     handleTrades () {

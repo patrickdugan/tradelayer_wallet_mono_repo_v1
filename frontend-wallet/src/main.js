@@ -18,6 +18,10 @@ import { MdApp, MdElevation, MdIcon, MdButton, MdContent, MdTabs, MdCard, MdRadi
 // import Vuetify from 'vuetify'
 // import AndyVueMaterial from 'andy-vue-material/dist'
 import CircleMenu from 'vue-side-circle-menu'
+import Toast, { POSITION } from "vue-toastification";
+// Import the CSS or use your own!
+import "vue-toastification/dist/index.css";
+
 Vue.component('CircleMenu', CircleMenu)
 const options = { name: 'lodash' } // customize the way you want to call it
 
@@ -44,6 +48,7 @@ Vue.filter('formatNoQuotes', function (value) {
 
 // import MenuIcon from 'vue-material-design-icons/Menu.vue'
 // Vue.component('menu-icon', MenuIcon)
+Vue.use(Toast, { timeout: 3000, position: POSITION.BOTTOM_RIGHT });
 Vue.use(MdButton)
 Vue.use(MdContent)
 Vue.use(MdTabs)

@@ -54,6 +54,7 @@
     "vue-password-strength-meter": "^1.4.2",
     "vue-router": "^3.0.1",
     "vue-side-circle-menu": "^2.1.8",
+    "vue-toastification": "^1.7.11",
     "vuelidate": "^0.7.4",
     "vuetify": "^1.2.4",
     "vuex": "^3.0.1",
