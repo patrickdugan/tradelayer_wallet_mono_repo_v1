@@ -118,7 +118,7 @@
       </div>
     </div>
 
-    <div class="md-layout md-small-hide">
+    <div>
       <md-tabs class="tabs-tight">
         <md-tab
           style="margin: 0px 0px -20px;"

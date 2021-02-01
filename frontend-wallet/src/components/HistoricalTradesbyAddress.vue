@@ -1,13 +1,13 @@
-<template>
-
-  <md-table style="width: 100%;" md-card>
-    <md-card-header>Your Recent Trades</md-card-header>
-    <md-table-row>
-      <md-table-cell>Raw TX</md-table-cell>
-      <md-table-cell>TradeLayer TX</md-table-cell>
-      <md-table-cell>Status</md-table-cell>
-    </md-table-row>
-    <md-table-row  v-if='lastRawTx'>
+<template >
+  <md-table style='text-align: left'>
+        <md-table-row>
+          <md-table-head style='width: 1rem'>#</md-table-head>
+          <md-table-head>Raw TX</md-table-head>
+          <md-table-head>TradeLayer TX</md-table-head>
+          <md-table-head>Status</md-table-head>
+        </md-table-row>
+    <md-table-row v-if='lastRawTx' >
+      <md-table-cell>0</md-table-cell>
       <md-table-cell>{{lastRawTx ? `${lastRawTx.slice(0,8)}...${lastRawTx.slice(-8)}` : '' }}</md-table-cell>
       <md-table-cell>{{ lastTlTx ? `${lastTlTx.slice(0,8)}...${lastTlTx.slice(-8)}` : 'Not yet created !' }}</md-table-cell>
       <md-table-cell>{{ lastTxStatus }}</md-table-cell>
@@ -85,14 +85,6 @@ export default {
   width: 10px;
   border: 1px solid #ddd;
   padding: 10px 10px;
-}
-
-.md-table-toolbar {
-  padding: 0px 0px 0px 00px;
-  margin: -10px 0px -20px 0px;
-  text-align: center;
-  font-size: 16px;
-
 }
 
 </style>
