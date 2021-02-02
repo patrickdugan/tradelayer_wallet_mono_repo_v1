@@ -7,11 +7,12 @@ const handleConnection = (client) => {
         client.emit('listeners-list', hardCodedListenersList)
     })
 
-    client.on('checkIfCommitsValid', async (txs) => {
+    client.on('checkIfCommitsValid', async (data) => {
+        const { commitTxsForCheck , rawTx } = data;
         console.log(':)');
-        if (!txs) return console.log('error')
-        console.log(txs)
-        const { listenerCommitTx, receiverCommitTx } = txs
+        if (!commitTxsForCheck) return console.log('error')
+        console.log(commitTxsForCheck)
+        const { listenerCommitTx, receiverCommitTx } = commitTxsForCheck
         if (!listenerCommitTx || !receiverCommitTx) return console.log('error')
 
         const listenerCommitIsValid = isTxValid(listenerCommitTx);
@@ -21,15 +22,17 @@ const handleConnection = (client) => {
                 const obj = {
                     listenerCommitIsValid: result[0],
                     receiverCommitIsValid: result[1],
+                    rawTx,
                 };
                 client.emit('validCommits', obj)
             })
     });
 
     client.on('checkValidTlTx', (data) => {
-        isTxValid(data)
+        const { tlTx, rawTx } = data;
+        isTxValid(tlTx)
             .then((result) => {
-                client.emit('validLastTx', result);
+                client.emit('validLastTx', { result, rawTx });
             })
     })
 }

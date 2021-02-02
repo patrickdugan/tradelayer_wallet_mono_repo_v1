@@ -230,9 +230,8 @@ export default {
       "createSimpleSendRawTx",
       "signRawTx",
       "sendRawTx",
-      "createSocketTrade",
       ]),
-
+    ...mapActions("channelsTrade", ["createSocketTrade"]),
     copyWalletAddress() {
         this.fromAddress = this.walletDec[this.currentAddressIndex].publicAddress;
     },

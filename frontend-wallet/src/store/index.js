@@ -7,8 +7,8 @@ import { orderbook } from './orderbook.module'
 import { contracts } from './contracts.module'
 import { pcurrency } from './pcurrency.module'
 import { loading } from './loading.module'
-import {wallet} from './wallet.module.js'
-
+import { wallet } from './wallet.module'
+import { channelsTrade } from './channelsTrade.module'
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -19,6 +19,7 @@ export const store = new Vuex.Store({
     contracts,
     pcurrency,
     loading,
-    wallet
+    wallet,
+    channelsTrade,
   }
 })

@@ -44,7 +44,7 @@ class Listener {
 
             this.client.on('success', (data) => {
                 this.saveTheLog(data);
-                this.client.emit('finalTx', data);
+                this.client.emit('finalTx', { finalTx: data, rawTx: this.finalRawTx });
                 console.log(`Transaction created: ${data}`)
             })
         })
@@ -69,7 +69,8 @@ class Listener {
             if (!data.complete) return console.error("Fail with signing the rawTX")
             const { hex } = data
             if (!hex) return console.erreor("Fail with signing the rawTX")
-            console.log(`coSigned RawTX: ${ hex }`)
+            console.log(`coSigned RawTX: ${ hex }`);
+            this.finalRawTx = hex;
             this.client.emit('readyForSending', {hex, commitTx: this.commitTx});
         })
     }

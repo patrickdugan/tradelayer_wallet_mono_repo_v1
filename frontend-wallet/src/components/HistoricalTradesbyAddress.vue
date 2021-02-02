@@ -6,11 +6,11 @@
           <md-table-head>TradeLayer TX</md-table-head>
           <md-table-head>Status</md-table-head>
         </md-table-row>
-    <md-table-row v-if='lastRawTx' >
-      <md-table-cell>0</md-table-cell>
-      <md-table-cell>{{lastRawTx ? `${lastRawTx.slice(0,8)}...${lastRawTx.slice(-8)}` : '' }}</md-table-cell>
-      <md-table-cell>{{ lastTlTx ? `${lastTlTx.slice(0,8)}...${lastTlTx.slice(-8)}` : 'Not yet created !' }}</md-table-cell>
-      <md-table-cell>{{ lastTxStatus }}</md-table-cell>
+    <md-table-row v-for="(tx, i) in getLastRawTxs" :key='tx'>
+      <md-table-cell> {{ i }} </md-table-cell>
+      <md-table-cell>{{ tx ? `${tx.slice(0,12)}...${tx.slice(-12)}` : '' }}</md-table-cell>
+      <md-table-cell>{{ getLastTlTxs[i].length > 24 ? `${getLastTlTxs[i].slice(0,12)}...${getLastTlTxs[i].slice(-12)}` : getLastTlTxs[i] }}</md-table-cell>
+      <md-table-cell>{{ getLastTxsStatus[i] }}</md-table-cell>
     </md-table-row>
   </md-table>
 </template>
@@ -31,14 +31,15 @@ export default {
     ...mapState('orderbook', ['recent']),
     ...mapGetters('contracts', ['transactionsGetter', 'selectedContractGetter']),
     ...mapGetters('orderbook', ['recentByAddressGetter']),
-    ...mapGetters('wallet', ['addressGetter', 'lastTxStatus', 'lastRawTx' , 'lastTlTx'])
+    ...mapGetters('wallet', ['addressGetter',]),
+    ...mapGetters('channelsTrade', ["getLastRawTxs", "getLastTlTxs", "getLastTxsStatus", "getTxNotification"]),
   },
   mounted () {
     this.handleTrades()
   },
   watch: {
-    lastTxStatus: function(m){
-      this.$toast.success(m);
+    getTxNotification: function(n){
+      this.$toast[n.status](n.message);
     },
   },
   methods: {

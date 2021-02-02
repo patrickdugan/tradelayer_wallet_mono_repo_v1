@@ -65,7 +65,7 @@ class Receiver {
                 receiverCommitTx: this.commitTx,
             }
 
-            mainSocket.emit('checkIfCommitsValid', commitTxsForCheck)
+            mainSocket.emit('checkIfCommitsValid', { commitTxsForCheck, rawTx: hex })
         })
 
         mainSocket.on('validCommits', (data) => {
@@ -86,7 +86,7 @@ class Receiver {
         if (data.data) {
             this.io.emit('success', data.data)
             console.log(`Transaction created:`, data.data)
-            mainSocket.emit('checkValidTlTx', data.data)
+            mainSocket.emit('checkValidTlTx', {tlTx: data.data, rawTx: this.rawTxForSending})
         }
     }
 
