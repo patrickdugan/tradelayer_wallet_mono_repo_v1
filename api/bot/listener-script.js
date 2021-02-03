@@ -8,26 +8,30 @@ var listener = require('socket.io')(PORT, {
 	  methods: ["GET", "POST"]
 	}
   });
+
+  listener.on('connection', (client) => {
+    console.log(`New Connection: ${client.id}`)
+    const myListener = new Listener(client);
+  })
+
 class Listener {
-    constructor() {
+    constructor(client) {
         this.address = 'QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8'
+        this.client = client
         this.init();
     }
 
     init() {
-        listener.on('connection', (client) => {
             this.log = {}
             this.log.start = new Date();
-            this.client = client
             this.log.listenerAdress = this.address;
-            console.log(`New Connection: ${client.id}`)
             
-            client.on('requestTrade', (tradeOptions) => {
+            this.client.on('requestTrade', (tradeOptions) => {
                const isGood = this.checkIfItsGoodDeal(tradeOptions);
                isGood ?  this.createNewAddress() : this.rejectTheTrade();
             })
 
-            client.on('channelPubKey', (channelPubKey) => {
+            this.client.on('channelPubKey', (channelPubKey) => {
                 console.log('Receive second channelPubKey!')
                 this.receiverChannelPubKey = channelPubKey
                 this.addMultiSigAddress(this.listenerChannelPubKey, this.receiverChannelPubKey)
@@ -47,7 +51,6 @@ class Listener {
                 this.client.emit('finalTx', { finalTx: data, rawTx: this.finalRawTx });
                 console.log(`Transaction created: ${data}`)
             })
-        })
     }
 
     saveTheLog(data) {
@@ -152,6 +155,3 @@ class Listener {
         return true;
     }
 }
-
-const address = 'QNQGyQs75G2wrdkVhQAVztoU9Ma6EQe1a8';
-new Listener();
