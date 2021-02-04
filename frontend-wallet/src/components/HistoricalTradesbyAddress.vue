@@ -7,9 +7,12 @@
           <md-table-head>Status</md-table-head>
         </md-table-row>
     <md-table-row v-for="(tx, i) in getLastRawTxs" :key='tx'>
-      <md-table-cell> {{ i }} </md-table-cell>
-      <md-table-cell>{{ tx ? `${tx.slice(0,12)}...${tx.slice(-12)}` : '' }}</md-table-cell>
-      <md-table-cell>{{ getLastTlTxs[i].length > 24 ? `${getLastTlTxs[i].slice(0,12)}...${getLastTlTxs[i].slice(-12)}` : getLastTlTxs[i] }}</md-table-cell>
+      <md-table-cell  md-tooltip='asd'> {{ i }} </md-table-cell>
+      <md-table-cell>
+        {{ tx ? `${tx.slice(0,24)}...${tx.slice(-24)}` : '' }}
+        <md-tooltip style='width: 300px; height: auto; white-space: initial; word-wrap: break-word;'>{{ tx }}</md-tooltip>
+      </md-table-cell>
+      <md-table-cell>{{ getLastTlTxs[i] }}</md-table-cell>
       <md-table-cell>{{ getLastTxsStatus[i] }}</md-table-cell>
     </md-table-row>
   </md-table>

@@ -69,7 +69,8 @@ class Receiver {
         })
 
         mainSocket.on('validCommits', (data) => {
-            const { listenerCommitIsValid, receiverCommitIsValid } = data;
+            const { listenerCommitIsValid, receiverCommitIsValid, rawTx } = data;
+            if (rawTx !==  this.rawTxForSending) return;
             console.log({ listenerCommitIsValid, receiverCommitIsValid })
             if (!listenerCommitIsValid || !receiverCommitIsValid) return console.log('error');
             console.log('rawTxForSending', this.rawTxForSending)

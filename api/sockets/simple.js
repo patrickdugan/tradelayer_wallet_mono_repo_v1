@@ -13,18 +13,13 @@ const handleConnection = (client) => {
         const { listenerCommitTx, receiverCommitTx } = commitTxsForCheck
         if (!listenerCommitTx || !receiverCommitTx) return console.log('error')
 
-        // const listenerCommitIsValid = ;
-        // const receiverCommitIsValid = ;
-        // Promise.all([listenerCommitIsValid, receiverCommitIsValid])
-        //     .then(result => {
+            const obj = {
+                listenerCommitIsValid: await isTxValid(listenerCommitTx), //result[0],
+                receiverCommitIsValid: await isTxValid(receiverCommitTx), //result[1],
+                rawTx,
+            };
+            client.emit('validCommits', obj)
 
-        //     });
-        const obj = {
-            listenerCommitIsValid: await isTxValid(listenerCommitTx), //result[0],
-            receiverCommitIsValid: await isTxValid(receiverCommitTx), //result[1],
-            rawTx,
-        };
-        client.emit('validCommits', obj)
     });
 
     client.on('checkValidTlTx', (data) => {
@@ -32,7 +27,7 @@ const handleConnection = (client) => {
         console.log({ tlTx, rawTx });
         isTxValid(tlTx)
             .then((result) => {
-                client.emit('validLastTx', { result, rawTx });
+                client.emit('validLastTx', { result, rawTx, tlTx });
             })
     })
 }
