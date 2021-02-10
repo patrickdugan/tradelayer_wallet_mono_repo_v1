@@ -29,13 +29,16 @@
           <md-tab id="tab-taxes" md-label="Taxes" to="/Taxes"></md-tab>
         </md-tabs>
       </div>
-            <md-button
+
+    <div class='contracts-list'>
+          <div class="button-container" v-for="contract of contractsList" v-bind:key="contract.id">
+          <md-button
             class='md-primary'
-            v-for="contract of contractsList" 
-            v-bind:key="contract.id"  
             v-on:click="handleSelectedContract(contract.id)">
             {{ contract.propsNameForSale }}/{{ contract.propsNameDesired }}
-            </md-button>
+          </md-button>
+          </div>
+    </div>
     <div class="md-layout md-alignment-top-center">
       <div
         class="md-xsmall-hide md-small-hide md-layout-item md-small-size-100 md-medium-size-25 md-large-size-25"
@@ -175,6 +178,12 @@ export default {
           propsIdDesired: 5,
           type: "pairContract",
         },
+        {
+          id:   2,
+          propsNameForSale: 'LTC',
+          propsNameDesired: 'XYZ',
+          type: "LTC_instant",
+        },
       ]
     };
   },
@@ -221,14 +230,20 @@ export default {
 </script>
 
 <style scoped>
+
+.contracts-list {
+  margin: 1.5rem 0 1rem 0;
+  background-color: rgb(70, 70, 70);
+  box-shadow: 0 0 0.25rem black;
+  display: flex;
+  justify-content: center;
+}
+
 .md-table-toolbar {
   padding: 0px 0px 0px 00px;
   margin: -40px 0px -20px 0px;
   text-align: center;
   font-size: 16px;
-}
-
-.md-tabs-content {
 }
 
 .tabs-tight {
