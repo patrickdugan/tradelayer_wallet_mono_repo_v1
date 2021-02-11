@@ -11,7 +11,7 @@
     "seed": "node scripts/seed.js",
     "bot": "node bot/TradeLayerBot.js",
     "bot-t2t": "node bot/Token2TokenBot.js",
-    "listener": "node bot/listener-script"
+    "listener": "node bot/listener-script2"
   },
   "author": "",
   "license": "ISC",

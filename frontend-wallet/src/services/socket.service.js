@@ -1,5 +1,5 @@
 import socket from '../socket/socketconnect.js'
-import Receiver from '../socket/receiver';
+import Receiver from '../socket/receiver3';
 import { Notification } from '../store/channelsTrade.module';
 import { store } from '../store'
 
@@ -48,7 +48,8 @@ socket.on('validLastTx', (data) => {
 
 const initNewReceiver = (listenerURL, options) => {
   console.log(`Init Connection with ${listenerURL}`);
-  return new Receiver(listenerURL, options)
+  // return new Receiver(listenerURL, options)
+  return new Receiver(listenerURL)
 };
 
 export const socketService = {

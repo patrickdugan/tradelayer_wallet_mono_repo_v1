@@ -1,7 +1,7 @@
 const express = require('express')
 const txnRouter = express.Router()
 const request = require('request')
-
+const tl = require('../bot/TL-RPC-API-ASYNC');
 // const {Txn} = require('../models/index.js') 
 
 txnRouter.post('/', (req,res)=>{
@@ -183,6 +183,12 @@ txnRouter.get('/callRPC', (req, res) => {
         res.send({data});
     })
 })
+
+txnRouter.get('/callAsyncRPC', (req, res) => {
+    const { command, args } = req.query;
+    tl[command](...JSON.parse(args))
+        .then(result => res.send(result));
+});
 // --> commented out models
 // const getUTXOsForManyTxns = async (txnDataArray, omniClient, next)=>{
 //     let allUTXOs = []

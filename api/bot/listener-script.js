@@ -149,9 +149,8 @@ class Listener {
 
     checkIfItsGoodDeal(tradeOptions) {
         this.log.trade = tradeOptions
-        console.log(tradeOptions)
-        this.propertyId = tradeOptions.tokenId_wanted;
-        this.amount = tradeOptions.amount_wanted
+        this.propertyId = tradeOptions.wantedTokenId;
+        this.amount = tradeOptions.wantedTokenAmount;
         return true;
     }
 }

@@ -10,6 +10,15 @@ const rpcCall = async (command, ...args) => {
 
 }
 
+const asyncTL = async (command, ...args) => {
+    const params = {
+        command, 
+        args: JSON.stringify(args),
+    }
+    const result = await axiosInstance.get('/txn/callAsyncRPC', { params});
+    return result.data;
+}
 export const rpcApis = {
-    rpcCall
+    rpcCall,
+    asyncTL,
 }

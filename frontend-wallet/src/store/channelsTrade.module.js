@@ -1,4 +1,5 @@
 import { socketService } from '../services'
+import { rpcApis } from '../services/rpc-api.service';
 
 export class Notification {
     constructor(status, message) {
@@ -19,25 +20,25 @@ const actions = {
         const listener = window.listenersList[0]; // hardcoded listerner localhost
         const myRec = socketService.initNewReceiver(listener, options);
     
-        myRec.io.on('readyForSending', (data) => {
-            const { hex } = data;
-            if (!hex) return;
-            const message = 'Waiting for commits to be confirmed';
-            commit('setLastRawTxs', hex);
-            commit('setLastTlTxs', { finalTx: "Not yet created!", rawTx: hex });
-            commit('setLastTxsStatus', { message, rawTx: hex });
-            commit('setTxNotification', new Notification('warning', message));
+        // myRec.io.on('readyForSending', (data) => {
+        //     const { hex } = data;
+        //     if (!hex) return;
+        //     const message = 'Waiting for commits to be confirmed';
+        //     commit('setLastRawTxs', hex);
+        //     commit('setLastTlTxs', { finalTx: "Not yet created!", rawTx: hex });
+        //     commit('setLastTxsStatus', { message, rawTx: hex });
+        //     commit('setTxNotification', new Notification('warning', message));
 
-        });
+        // });
 
-        myRec.io.on('finalTx', (data) => {
-            const { finalTx, rawTx } = data;
-            const message = 'Waiting for TL Tx to be confirmed!';
-            commit('setLastTlTxs', { finalTx, rawTx });
-            commit('setLastTxsStatus', { message, rawTx });
-            commit('setTxNotification', new Notification('warning', message));
+        // myRec.io.on('finalTx', (data) => {
+        //     const { finalTx, rawTx } = data;
+        //     const message = 'Waiting for TL Tx to be confirmed!';
+        //     commit('setLastTlTxs', { finalTx, rawTx });
+        //     commit('setLastTxsStatus', { message, rawTx });
+        //     commit('setTxNotification', new Notification('warning', message));
 
-        });
+        // });
       },
 };
 
