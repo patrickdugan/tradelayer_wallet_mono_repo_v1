@@ -77,7 +77,7 @@ api.commitToChannel = async (sendingAddress, channelAddress, propertyid, amount)
 
 // Complex RPC APIs
 
-api.complex.getBestBlock = async () => {
+api.getBestBlock = async () => {
     const bestBlockHashResult = await api.getBestBlockHash();
     const bestBlockHashError = bestBlockHashResult.error;
     const bestBlockHashData = bestBlockHashResult.data;
@@ -87,5 +87,5 @@ api.complex.getBestBlock = async () => {
         : await api.getBlock(bestBlockHashData);
 };
 
-api.complex.buildRawTx = async () => {};
+api.buildRawTx = async () => {};
 module.exports = api;
