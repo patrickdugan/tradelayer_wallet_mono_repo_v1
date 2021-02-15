@@ -1,5 +1,5 @@
 import { socketService } from '../services'
-import { rpcApis } from '../services/rpc-api.service';
+import socket from '../socket/socketconnect'
 
 export class Notification {
     constructor(status, message) {
@@ -9,60 +9,50 @@ export class Notification {
 }
 
 const state = {
-    lastRawTxs: [],
-    lastTlTxs: [],
-    lastTxsStatus: [],
+    txs: [],
     txNotification: null,
 };
 
 const actions = {
     createSocketTrade: async ({ commit, state }, options) => {
         const listener = window.listenersList[0]; // hardcoded listerner localhost
-        const myRec = socketService.initNewReceiver(listener, options);
-    
-        // myRec.io.on('readyForSending', (data) => {
-        //     const { hex } = data;
-        //     if (!hex) return;
-        //     const message = 'Waiting for commits to be confirmed';
-        //     commit('setLastRawTxs', hex);
-        //     commit('setLastTlTxs', { finalTx: "Not yet created!", rawTx: hex });
-        //     commit('setLastTxsStatus', { message, rawTx: hex });
-        //     commit('setTxNotification', new Notification('warning', message));
-
-        // });
-
-        // myRec.io.on('finalTx', (data) => {
-        //     const { finalTx, rawTx } = data;
-        //     const message = 'Waiting for TL Tx to be confirmed!';
-        //     commit('setLastTlTxs', { finalTx, rawTx });
-        //     commit('setLastTxsStatus', { message, rawTx });
-        //     commit('setTxNotification', new Notification('warning', message));
-
-        // });
+        const receiver = socketService.initNewReceiver(listener, options);
+        receiver.resultPromise.then(resultObj => {
+            socket.emit('CHECK_COMMITS', resultObj);
+            const message = 'Waiting for commits to be confirmed';
+            const rawTx = resultObj.signedRawTx
+            commit('pushNewTx', { rawTx: resultObj.signedRawTx })
+            commit('setTxStatus', { message, rawTx });
+            commit('setTxNotification', new Notification('warning', message));
+        });
       },
 };
 
 const getters = {
-    getLastRawTxs: (state) => state.lastRawTxs,
-    getLastTlTxs: (state) => state.lastTlTxs,
-    getLastTxsStatus: (state) => state.lastTxsStatus,
+    getLastTx: (state) => state.txs[0],
+    getLast10Tx: (state) => state.txs.slice(0, 10),
+    getAlltx: (state) => state.txs,
     getTxNotification: (state) => state.txNotification,
-
 };
 
 const mutations = {
-    setLastRawTxs: (state, hex) => state.lastRawTxs = [...state.lastRawTxs, hex],
-    setLastTlTxs: (state, payload) => {
-        const { finalTx, rawTx } = payload;
-        const index = state.lastRawTxs.findIndex(tx => tx === rawTx);
-        state.lastTlTxs = [...state.lastTlTxs];
-        state.lastTlTxs[index] = finalTx;
+    pushNewTx: (state, payload) => {
+        const txObj = {
+            rawTx: payload.rawTx,
+            tlTx: 'Not yet created...',
+        };
+          state.txs = [txObj, ...state.txs]
     },
-    setLastTxsStatus: (state, payload) => {
+    setTlTx: (state, payload) => {
+        const { tlTx, rawTx } = payload;
+        const index = state.txs.findIndex(tx => tx.rawTx === rawTx);
+        state.txs[index].tlTx = tlTx;
+    },
+    setTxStatus: (state, payload) => {
         const { message, rawTx } = payload;
-        const index = state.lastRawTxs.findIndex(tx => tx === rawTx);
-        state.lastTxsStatus = [...state.lastTxsStatus];
-        state.lastTxsStatus[index] = message;
+        const index = state.txs.findIndex(tx => tx.rawTx === rawTx);
+        state.txs[index].message = message;
+
     },
     setTxNotification: (state, notification) => state.txNotification = notification,
 };

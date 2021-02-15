@@ -67,14 +67,14 @@ class Listener {
         this.commitToChannel();
     }
 
-    onListunspend(data) {
+    async onListunspend(data) {
         if (!data || data !== this.multySigChannelData.address) return console.error('Wrong MultySig Address Provided!');
         if (logs) console.log(`Getting unspent for multySig Address`);
-        const lusRes = tl.listunspent(0, 9999999, [data]);
+        const lusRes = await tl.listunspent(0, 9999999, [data]);
         if (lusRes.error) return console.log(lusRes.error);
         if (!lusRes.data || lusRes.data.length < 1) return console.error(`Not found unspents for the channel Address`);
-        this.client.emit(EmitTypes.LISTUNSPENT, data);
-        if (logs) console.log(`Unspents for multySig Address length ${data.length}`);
+        this.client.emit(EmitTypes.LISTUNSPENT, lusRes.data);
+        if (logs) console.log(`Unspents for multySig Address length ${lusRes.data.length}`);
     }
 
     onRawTxForSigning(data) {
@@ -137,8 +137,8 @@ class Listener {
         if (logs) console.log(`Signing RawTx`);
         const ssrtxRes = await tl.simpleSignRawTx(rawTx);
         if (ssrtxRes.error) return console.log(ssrtxRes.error);
-        if (!ssrtxRes.data) return;
-        this.client.emit(EmitTypes.SIGNED_RAWTX, ssrtxRes.data);
-        if (logs) console.log(`Signed RawTx ${ssrtxRes.data}`);
+        if (!ssrtxRes.data || !ssrtxRes.data.complete || !ssrtxRes.data.hex) return;
+        this.client.emit(EmitTypes.SIGNED_RAWTX, ssrtxRes.data.hex);
+        if (logs) console.log(`Signed RawTx ${ssrtxRes.data.hex}`);
     }
 }

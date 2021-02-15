@@ -68,8 +68,8 @@ api.addMultisigAddress = async (n, pubkeysArray) =>
 api.getTransaction = async (tx) => 
     await asyncClient("tl_gettransaction", tx);
 
-api.createPayload_instantTrade = async (id1, amount1, expiryBlockHeight, id2, amount2) =>
-    await asyncClient('tl_createpayload_instant_trade', id1, amount1, expiryBlockHeight, id2, amount2);
+api.createPayload_instantTrade = async (id1, amount1, id2, amount2, expiryBlockHeight) =>
+    await asyncClient('tl_createpayload_instant_trade', id1, amount1, id2, amount2, expiryBlockHeight);
 
 api.commitToChannel = async (sendingAddress, channelAddress, propertyid, amount) =>
     await asyncClient("tl_commit_tochannel",sendingAddress, channelAddress, propertyid, amount);
@@ -87,5 +87,30 @@ api.getBestBlock = async () => {
         : await api.getBlock(bestBlockHashData);
 };
 
-api.buildRawTx = async () => {};
+api.buildRawTx = async (txid, vout, payload, refAddress = null, changeAddress = null) => {
+    if (!txid || vout === undefined || !payload) return { error: 'Missing txid, vout or payload' };
+    const piRes = await asyncClient('decodescript', payload);
+    if (piRes.error || !piRes.data) return { error: `${payload} Payload is not valid!` };
+    const txoiRes = await asyncClient('gettxout', txid, vout);
+    if (txoiRes.error || !txoiRes.data) return { error: 'Error with tx id or vout' };
+    const value = txoiRes.data.value;
+    const scriptPubKey = txoiRes.data.scriptPubKey.hex;
+    const _changeAddress = changeAddress ? changeAddress : txoiRes.data.scriptPubKey.addresses[0];
+    const changeData = [{ txid, vout, scriptPubKey, value, }];
+
+    const crtxiRes = await asyncClient('tl_createrawtx_input', '', txid, vout);
+    if (crtxiRes.error || !crtxiRes.data) return { error: 'Error with creating raw tx' };
+
+    const crtxoRes = await asyncClient('tl_createrawtx_opreturn', crtxiRes.data, payload);
+    if (crtxoRes.error || !crtxoRes.data) return { error: 'Error with adding payload' };
+
+    const crtxrRes = !refAddress ? crtxoRes : await asyncClient('tl_createrawtx_reference', crtxoRes.data, refAddress);
+    if (crtxrRes.error || !crtxrRes.data) return { error: 'Error with adding referance address' };
+
+    const crtxcRes = await asyncClient('tl_createrawtx_change', crtxrRes.data, changeData, _changeAddress, '0.00036000');
+    if (crtxcRes.error || !crtxcRes.data) return { error: 'Error with adding change address' };
+
+    return crtxcRes;
+};
+
 module.exports = api;

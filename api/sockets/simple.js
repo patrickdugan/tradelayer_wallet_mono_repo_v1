@@ -1,5 +1,5 @@
 const hardCodedListenersList = ['http://localhost:9876'];
-const tlAPI = require('../bot/TradeLayerRPCAPI')
+const asyncTL = require('../bot/TL-RPC-API-ASYNC');
 const handleConnection = (client) => {
     console.log(`New Connection ${client.id}`);
 
@@ -7,42 +7,39 @@ const handleConnection = (client) => {
         client.emit('listeners-list', hardCodedListenersList)
     })
 
-    client.on('checkIfCommitsValid', async (data) => {
-        const { commitTxsForCheck , rawTx } = data;
-        if (!commitTxsForCheck) return console.log('error')
-        const { listenerCommitTx, receiverCommitTx } = commitTxsForCheck
-        if (!listenerCommitTx || !receiverCommitTx) return console.log('error')
-
-            const obj = {
-                listenerCommitIsValid: await isTxValid(listenerCommitTx), //result[0],
-                receiverCommitIsValid: await isTxValid(receiverCommitTx), //result[1],
-                rawTx,
+    client.on('CHECK_COMMITS', async (data) => {
+        const { commitTxs, signedRawTx } = data;
+        const { listenerCommitTx, receiverCommitTx } = commitTxs;
+        const result = {
+                listenerCommitIsValid: await isTxValid(listenerCommitTx),
+                receiverCommitIsValid: await isTxValid(receiverCommitTx),
+                rawTx: signedRawTx,
             };
-            client.emit('validCommits', obj)
-
+        client.emit('CHECK_COMMITS_RES', result);
     });
 
-    client.on('checkValidTlTx', (data) => {
+    client.on('CHECK_TL_TX', async (data) => {
         const { tlTx, rawTx } = data;
-        console.log({ tlTx, rawTx });
-        isTxValid(tlTx)
-            .then((result) => {
-                client.emit('validLastTx', { result, rawTx, tlTx });
-            })
+        const result = {
+            rawTx,
+            tlTx,
+            isTlTxValid: await isTxValid(tlTx),
+        };
+        client.emit('CHECK_TL_TX_RES', result);
     })
 }
 
 function isTxValid(txid) {
     console.log(`Chcking if txIsValid ${txid}`)
     return new Promise((res,rej) => {
-        const interval = setInterval(() => {
-            tlAPI.tl.getTransaction(txid, (data) => {
-                if (data && data.confirmations > 0) {
-                    clearInterval(interval)
-                    res(data.valid)
-                }
-            })
-        }, 5000)
+        const interval = setInterval(async () => {
+            const gtRes = await asyncTL.getTransaction(txid);
+            if (gtRes.error || !gtRes.data) return;
+            if (gtRes.data.confirmations > 0) {
+                res(gtRes.data.valid);
+                clearInterval(interval);
+            }
+        }, 20000)
     })
 }
 // function checkMultisigReady(channelAddress) {

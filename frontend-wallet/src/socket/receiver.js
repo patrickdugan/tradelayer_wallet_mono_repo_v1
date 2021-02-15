@@ -1,197 +1,224 @@
-import client from 'socket.io-client';
+import io from 'socket.io-client';
 import { rpcApis } from '../services/rpc-api.service';
 
-import mainSocket from './socketconnect'
+const logs = false;
 
-class Receiver {
-    constructor(listenerURL, options) {
-        this.address = options.fromAddress
-        this.propertyId = options.propsIdForSale
-        this.amount = options.amountForSale;
-        this.propertyId2 = options.propsIdDesired
-        this.amount2 = options.amountDesired;
-        this.io = client.connect(listenerURL);
-        this.init();
-        console.log(options)
+
+const EmitTypes = {
+    TRADE_REQUEST: 'TRADE_REQUEST',
+    CHANNEL_PUB_KEY: 'CHANNEL_PUB_KEY',
+    TRADE_TOKEN_TOKEN: 'TRADE_TOKEN_TOKEN',
+    LISTUNSPENT: 'LISTUNSPENT',
+    RAWTX_FOR_SIGNING: 'RAWTX_FOR_SIGNING',
+};
+
+const OnTypes = {
+    CHANNEL_PUB_KEY: 'CHANNEL_PUB_KEY',
+    TRADE_REJECTION: 'TRADE_REJECTION',
+    MULTYSIG_DATA: 'MULTYSIG_DATA',
+    COMMIT_TX: 'COMMIT_TX',
+    LISTUNSPENT: 'LISTUNSPENT',
+    SIGNED_RAWTX: 'SIGNED_RAWTX',
+};
+
+
+export default class Receiver {
+    constructor(listenerURL) {
+        this.listenerUrl = listenerURL;
+        this.initConnection();
+
+        this.resultPromise = new Promise((res, rej) => {
+            this._resultPromise = { res, rej };
+        });
     }
 
-    init() {
-        this.io.on('connect', () => {
-            this.sendTradeRequest()
-        })
-
-        this.io.on('tradeRejection', (message) => {
-            console.log(message);
-        })
-
-        this.io.on('channelPubKey', () => {
-            this.getNewAddress()
-        })
-
-        this.io.on('multisig', (multySigData) => {
-            console.log(`Receiving multisig Data`, multySigData)
-            this.legitMultisig(multySigData, (legit) => {
-                console.log(`Legit the Multisig: ${legit}`)
-                if (legit == true) {
-                    this.channelMultisig = multySigData.multisig.address
-                    this.commitToChannel(this.channelMultisig)
-                } else { 
-                    return console.log('The client tried to scam with a bad multisig')
-                }
-            })
-        })
-
-        this.io.on('buildRawTx', (buildRawTxData) => {
-            const { listenerParams } = buildRawTxData
-            const unspentArray = buildRawTxData.listunspent
-            console.log(`Start Building rawTx from unspents: ${unspentArray.length}`);
-
-            this.buildTokenToTokenTrade(unspentArray, this.propertyId, this.amount, this.propertyId2, this.amount2, true, (res) => {
-                if(res.error) return console.log(res.error);
-                const rawTx = res.data
-                console.log(`Builded rawTx: ${rawTx}`)
-                if (!rawTx) return console.error('Can not Build RawTX')
-                this.signRawTx(rawTx)
-            })
-        })
-
-        this.io.on('readyForSending', (data) => {
-            const { hex, commitTx } = data;
-            if (!hex || !commitTx) return console.log('error!');
-            console.log(`readyForSending: ${hex}`);
-            this.rawTxForSending = hex;
-            const commitTxsForCheck = {
-                listenerCommitTx: commitTx,
-                receiverCommitTx: this.commitTx,
-            }
-
-            mainSocket.emit('checkIfCommitsValid', { commitTxsForCheck, rawTx: hex })
-        })
-
-        mainSocket.on('validCommits', (data) => {
-            const { listenerCommitIsValid, receiverCommitIsValid, rawTx } = data;
-            if (rawTx !==  this.rawTxForSending) return;
-            console.log({ listenerCommitIsValid, receiverCommitIsValid })
-            if (!listenerCommitIsValid || !receiverCommitIsValid) return console.log('error');
-            console.log('rawTxForSending', this.rawTxForSending)
-            this.sendRawTx(this.rawTxForSending)
-        })
+    initConnection() {
+        this.client = io.connect(this.listenerUrl, { 'reconnection': false });
+        this.client.on('connect', this.connected.bind(this));
     }
 
-    async sendRawTx(hex) {
-        const sendResult = await rpcApis.rpcCall('sendRawTransaction', hex);
-        const { data, error } = sendResult;
-        console.log(sendResult)
-        if (error) return console.log(error.message);
-        if(!data.data) return console.error("Fail with sending the rawTX")
-        if (data.data) {
-            this.io.emit('success', data.data)
-            console.log(`Transaction created:`, data.data)
-            mainSocket.emit('checkValidTlTx', {tlTx: data.data, rawTx: this.rawTxForSending})
+    connected() {
+        if (logs) console.log(`Connected to: ${this.listenerUrl}`);
+        this.handleMainListeners();
+        this.requestTrade();
+    }
+
+    emitError(errorMessage) {
+        this.client.disconnect();
+        this._resultPromise.rej(errorMessage);
+        console.error(errorMessage);
+    }
+
+    handleMainListeners() {
+        try {
+            this.client.on(OnTypes.TRADE_REJECTION, this.onTradeRejection.bind(this));
+            this.client.on(OnTypes.CHANNEL_PUB_KEY, this.onChannelPubKey.bind(this));
+            this.client.on(OnTypes.MULTYSIG_DATA, this.onMultySigData.bind(this));
+            this.handleSubListeners();
+        } catch (error) {
+            this.emitError(error.message || 'Error with socket on listeners');
         }
     }
 
-    async signRawTx(rawTx) {
-        console.log(`Start Signing rawTx`)
-        const signResult = await rpcApis.rpcCall('simpleSign', rawTx);
-        const { data, error } = signResult;
-        console.log(data)
-        if (error) return console.log(error.message);
-        if (!data) return;
-        if (!data.data.complete) return console.error("Fail with signing the rawTX")
-        const { hex } = data.data
-        if (hex) {
-            console.log(`Signed RawTX: ${ hex }`)
-            this.io.emit('signedRawTx', hex)
-        }
+    onTradeRejection(data) {
+        if (logs) console.log(`Trade Rejection ${JSON.stringify(data)}`);
+        this.client.disconnect();
     }
 
-    async buildTokenToTokenTrade(inputs, id1, amount1, id2, amount2, secondSigner = true, cb) {
-        const blockResult = await rpcApis.rpcCall('getBlock', null);
-        const blockData = blockResult.data;
-        const blockError = blockResult.error;
-        if (blockError) return console.log(blockError.message);
-        console.log(`old Height: ${blockData.height} `)
-        if (!blockData) return;
-        const height = blockData.height + 5
-        console.log(`new Height: ${height} `)
-        console.log(`block Height: ${height}`)
-
-        const payloadResult = await rpcApis.rpcCall('createpayload_instant_trade', id1, amount1, id2, amount2, height);
-        const payloadData = payloadResult.data
-        const payloadError = payloadResult.error
-
-        if (payloadError) return console.log(payloadError.message);
-        if (!payloadData) return;
-        const buildOptions = {
-            txid: inputs[0].txid,
-            vout: inputs[0].vout,
-            payload: payloadData,
-        }
-
-        const buildRawResult = await rpcApis.rpcCall('buildRawAsync', buildOptions);
-        const buildRawData = buildRawResult.data
-        const buildRawError = buildRawResult.error
-
-        if (buildRawError) return console.log(buildRawError.message);
-        if (!buildRawData) return console.error('Cant build RawTx')
-        cb(buildRawData)
+    onChannelPubKey(data) {
+        if (!data) return this.emitError('No Channel Pub Key Provided!');
+        if (logs) console.log(`Received Channel Pub Key ${data}`);
+        this.listenerChannelPubKey = data;
+        this.createNewAddress();
     }
 
-    async commitToChannel(multiSigAddress) {
-        console.log(`Commiting to Channel!`)
-        const result = await rpcApis.rpcCall('commitToChannel', this.address, multiSigAddress, this.propertyId, this.amount);
-        const { data, error } = result.data;
-        console.log({ data, error })
-        if (error) return console.log(error);
-        if (data) {
-            this.commitTx = data;
-            console.log(`Commited to The multisig Address, result: ${data}`)
-            this.io.emit('multisig');
-        }
+    onMultySigData(data) {
+        if (!data) return this.emitError('No MultySig Data Provided!');
+        if (logs) console.log(`Received MultySig data: ${JSON.stringify(data)}`);
+        const pubKeys = [this.listenerChannelPubKey, this.receiverChannelPubKey]
+        const isValid = this.legitMultySig(pubKeys, data.redeemScript);
+        if (logs) console.log(`Received MultySig Address is${ isValid ? '' : "NOT" } valid`);
+        if (!isValid) return this.emitError('Wrong MyltySig Data Provided !');
+        this.multySigChannelData = data;
+        this.initTrade();
     }
 
-    async legitMultisig(multySigData, cb) {
-        console.log('addMultisigAddress', 2, [multySigData.pubKeyUsed, this.receiverChannelPubKey])
-        const result = await rpcApis.rpcCall('addMultisigAddress', 2, [multySigData.pubKeyUsed, this.receiverChannelPubKey]);
-        console.log(result)
-        const { data, error } = result;
-        if (error) return console.log(error.message);
-        const legit = data.reedemScript == multySigData.multisig.reedemScript ? true : false
-        cb(legit)
+    async createNewAddress() {
+        if (logs) console.log(`Creating New Address`);
+
+        const gnaRes = await rpcApis.asyncTL('getNewAdress');
+        if (gnaRes.error || !gnaRes.data) return this.emitError(gnaRes.error || 'Error with creating new address !');
+        if (logs) console.log(`Created New Address ${gnaRes.data}`);
+    
+        const vaResult = await rpcApis.asyncTL('validateAddress', gnaRes.data);
+        if (vaResult.error || !vaResult.data || !vaResult.data.isvalid) return this.emitError(vaResult.error || `Error with Address Validation`);
+        this.receiverChannelPubKey = vaResult.data.pubkey;
+        this.client.emit(EmitTypes.CHANNEL_PUB_KEY, this.receiverChannelPubKey)
+
+        if (logs) console.log(`Valid Address. PubKey: ${vaResult.data.pubkey}`);
     }
 
-    async getNewAddress() {
-        const result = await rpcApis.rpcCall('getNewAddress', null);
-        const { data, error } = result;
-        if (error) return console.log(error.message);
-        if (data) {
-            console.log(`Created New Address: ${data}`)
-            this.receiverChannelAddress = data;
-            this.validateAddress(data)
-        }
-    }
+    async legitMultySig(pubKeys, redeemScript) {
+        if (logs) console.log(`Legiting Multysig`);
 
-    async validateAddress(address) {
-        const result = await rpcApis.rpcCall('validateAddress', address);
-        const { data, error } = result;
-        if (error) return console.log(error.message);
-        if (data) {
-            this.receiverChannelPubKey = data.data.pubkey
-            console.log(`Address Validation:`, data)
-            this.io.emit('channelPubKey', this.receiverChannelPubKey)
-        }
-    }
-
-    sendTradeRequest() {
-        const tradeOptions = {
-            tokenId: this.propertyId,
-            tokenId_wanted: this.propertyId2,
-            amount: this.amount,
-            amount_wanted: this.amount2,
-        };
-        this.io.emit('requestTrade', tradeOptions);
+        const amaRes = await rpcApis.asyncTL('addMultisigAddress', 2, pubKeys);
+        if (amaRes.error || !amaRes.data) return this.emitError(amaRes.error || `Error with legit creating Multysig`);
+        const legitRedeemScript = amaRes.data.redeemScript;
+        return redeemScript === legitRedeemScript;
     }
 }
 
-export default Receiver
+export class TokenForTokenTradeReceiver extends Receiver {
+    constructor(listenerURL) {
+        super(listenerURL);
+        this.receiverAddress = 'QbbqvDj2bJkeZAu4yWBuQejDd86bWHtbXh'
+        this.tradeOptions = { 
+            offerTokenId: 4,
+            offerTokenAmount: '0.003', 
+            wantedTokenId: 5,
+            wantedTokenAmount: '0.0156' ,
+        };
+    }
+
+    handleSubListeners() {
+        this.client.on(OnTypes.COMMIT_TX, this.onCommitTx.bind(this));
+        this.client.on(OnTypes.LISTUNSPENT, this.onListunspent.bind(this));
+        this.client.on(OnTypes.SIGNED_RAWTX, this.onSignedRawTx.bind(this));
+    }
+
+    onCommitTx(data) {
+        if (!data) return this.emitError('No Commit Tx Provided!');
+        if (logs) console.log(`Receive Commit Tx ${data}`);
+        this.listenerCommitTx = data;
+        this.commitToChannel();
+    }
+
+    onListunspent(data) {
+        if (!data || data.length < 1) return this.emitError('No Unspents Provided!');
+        if (logs) console.log(`Channel Address unspents length ${data.length}`);
+        this.buildTokenForTokenTrade(data);
+    }
+
+    onSignedRawTx(data) {
+        if (!data) return this.emitError('No Signed RawTx Provided!');
+        if (logs) console.log(`Received Signed RawTx: ${data}`);
+        this.signRawTx(data);
+    }
+
+    requestTrade() {
+        if (logs) console.log(`Init Trade`);
+        const { offerTokenId, offerTokenAmount, wantedTokenId, wantedTokenAmount } = this.tradeOptions;
+        const tradeOptions = { offerTokenId, offerTokenAmount, wantedTokenId, wantedTokenAmount };
+        this.client.emit(EmitTypes.TRADE_REQUEST, tradeOptions);
+        if (logs) console.log(`Sended Trade Request ${JSON.stringify(tradeOptions)}`);
+    }
+
+    initTrade() {
+        if (logs) console.log(`Init Token/Token Trade !`);
+        this.client.emit(EmitTypes.TRADE_TOKEN_TOKEN);
+    }
+
+    async commitToChannel() {
+        if (logs) console.log(`Commiting Tokens to Channel`);
+        const commitData = [        
+            this.receiverAddress,
+            this.multySigChannelData.address,
+            this.tradeOptions.offerTokenId,
+            this.tradeOptions.offerTokenAmount,
+        ];
+        const ctcRes = await rpcApis.asyncTL('commitToChannel', ...commitData);
+        if (ctcRes.error || !ctcRes.data) return this.emitError(ctcRes.error || `Error with Commiting to channel`);
+        this.receiverCommitTx = ctcRes.data;
+        this.client.emit(EmitTypes.LISTUNSPENT, this.multySigChannelData.address);
+        if (logs) console.log(`Commit Channel Tx: ${ctcRes.data}`);
+    }
+
+    async buildTokenForTokenTrade(unspentsArray) {
+        if (logs) console.log(`Building Token/Token Trade`);
+        const bbRes = await rpcApis.asyncTL('getBestBlock');
+        if (bbRes.error || !bbRes.data || !bbRes.data.height) return this.emitError(bbRes.error || `Error with getting best block`);
+        const nAddBlocks = 5
+        const height = bbRes.data.height + nAddBlocks;
+        if (logs) console.log(`Best Block: ${bbRes.data.height} - exp.Block : ${height}`);
+
+        const cpitOptions = [
+            this.tradeOptions.offerTokenId,
+            this.tradeOptions.offerTokenAmount,
+            this.tradeOptions.wantedTokenId,
+            this.tradeOptions.wantedTokenAmount,
+            height,
+        ];
+        const cpitRes = await rpcApis.asyncTL('createPayload_instantTrade', ...cpitOptions);
+        if (cpitRes.error || !cpitRes.data) return this.emitError(cpitRes.error || `Error with creating payload`);
+        if (logs) console.log(`Created Instat Trade payload: ${cpitRes.data}`);
+
+        const brtxOptions = [unspentsArray[0].txid, unspentsArray[0].vout, cpitRes.data];
+        const brtxRes = await rpcApis.asyncTL('buildRawTx', ...brtxOptions)
+        if (brtxRes.error || !brtxRes.data) return this.emitError(brtxRes.error || `Error with Building raw TX`);
+        this.client.emit(EmitTypes.RAWTX_FOR_SIGNING, brtxRes.data);
+        if (logs) console.log(`Builded rawTx hex: ${brtxRes.data}`);
+    }
+
+    async signRawTx(rawTx) {
+        if (logs) console.log(`Signing The Raw Transaction`);
+        const ssrtxRes = await rpcApis.asyncTL('simpleSignRawTx', rawTx);
+        if (ssrtxRes.error || !ssrtxRes.data || !ssrtxRes.data.complete || !ssrtxRes.data.hex) return this.emitError(ssrtxRes.error || `Error with signing the tx`);
+        if (logs) console.log(`Signed RawTx ${ssrtxRes.data}`);
+        const _data = {
+            commitTxs: {
+                listenerCommitTx: this.listenerCommitTx,
+                receiverCommitTx: this.receiverCommitTx,
+            },
+            signedRawTx: ssrtxRes.data.hex,
+        };
+        this._resultPromise.res(_data);
+        this.client.disconnect();
+    }
+
+    async sendRawTx(rawTx) {
+        if (logs) console.log(`Sending The Raw Transaction`);
+        const srtxRes = await rpcApis.asyncTL('sendRawTx', rawTx);
+        if (srtxRes.error || !srtxRes.data) return this.emitError(srtxRes.error || `Error with Sending tx`);
+        if (true) console.log(`Final Transaction: ${srtxRes.data}`);
+    }
+}
