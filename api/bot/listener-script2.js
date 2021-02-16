@@ -10,7 +10,7 @@ const listener = require('socket.io')(PORT, socketOptions);
 const OnTypes = {
     TRADE_REQUEST: 'TRADE_REQUEST',
     CHANNEL_PUB_KEY: 'CHANNEL_PUB_KEY',
-    TRADE_TOKEN_TOKEN: 'TRADE_TOKEN_TOKEN',
+    COMMIT_TO_CHANNEL: ' COMMIT_TO_CHANNE',
     LISTUNSPENT: 'LISTUNSPENT',
     RAWTX_FOR_SIGNING: 'RAWTX_FOR_SIGNING',
 };
@@ -39,7 +39,7 @@ class Listener {
     handleListeners() {
         this.client.on(OnTypes.TRADE_REQUEST, this.onTradeRequest.bind(this));
         this.client.on(OnTypes.CHANNEL_PUB_KEY, this.onChannelPubKey.bind(this));
-        this.client.on(OnTypes.TRADE_TOKEN_TOKEN, this.onTradeTokenToken.bind(this));
+        this.client.on(OnTypes.COMMIT_TO_CHANNEL, this.onCommitToChannel.bind(this));
         this.client.on(OnTypes.LISTUNSPENT, this.onListunspend.bind(this));
         this.client.on(OnTypes.RAWTX_FOR_SIGNING, this.onRawTxForSigning.bind(this));
 
@@ -63,7 +63,7 @@ class Listener {
         this.addMultiSigAddress();
     }
 
-    onTradeTokenToken(data) {
+    onCommitToChannel(data) {
         this.commitToChannel();
     }
 

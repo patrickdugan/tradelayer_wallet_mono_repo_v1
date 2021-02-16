@@ -9,10 +9,9 @@ const handleConnection = (client) => {
 
     client.on('CHECK_COMMITS', async (data) => {
         const { commitTxs, signedRawTx } = data;
-        const { listenerCommitTx, receiverCommitTx } = commitTxs;
+        ;
         const result = {
-                listenerCommitIsValid: await isTxValid(listenerCommitTx),
-                receiverCommitIsValid: await isTxValid(receiverCommitTx),
+                commitsTxs: await Promise.all(commitTxs.map(async (tx) => ({tx, isValid: await isTxValid(tx)}))),
                 rawTx: signedRawTx,
             };
         client.emit('CHECK_COMMITS_RES', result);

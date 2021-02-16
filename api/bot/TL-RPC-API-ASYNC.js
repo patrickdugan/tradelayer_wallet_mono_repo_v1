@@ -62,6 +62,8 @@ api.listunspent = async (min = 0, max = 9999999, channelsArray = null) =>
 api.addMultisigAddress = async (n, pubkeysArray) =>
     await asyncClient("addmultisigaddress", n, pubkeysArray);
 
+api.fundRawTx = async (tx) =>
+    await asyncClient('fundrawtransaction', tx);
 
 // TradeLayer RPC APIs
 
@@ -70,6 +72,9 @@ api.getTransaction = async (tx) =>
 
 api.createPayload_instantTrade = async (id1, amount1, id2, amount2, expiryBlockHeight) =>
     await asyncClient('tl_createpayload_instant_trade', id1, amount1, id2, amount2, expiryBlockHeight);
+
+api.createPayload_instantTrade_LTC = async (id, amount, ltc, expiryBlockHeight) =>
+    await asyncClient('tl_createpayload_instant_ltc_trade', id, amount, ltc, expiryBlockHeight);
 
 api.commitToChannel = async (sendingAddress, channelAddress, propertyid, amount) =>
     await asyncClient("tl_commit_tochannel",sendingAddress, channelAddress, propertyid, amount);

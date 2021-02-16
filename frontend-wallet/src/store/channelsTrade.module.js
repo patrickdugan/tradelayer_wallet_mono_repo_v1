@@ -18,6 +18,7 @@ const actions = {
         const listener = window.listenersList[0]; // hardcoded listerner localhost
         const receiver = socketService.initNewReceiver(listener, options);
         receiver.resultPromise.then(resultObj => {
+            console.log({resultObj})
             socket.emit('CHECK_COMMITS', resultObj);
             const message = 'Waiting for commits to be confirmed';
             const rawTx = resultObj.signedRawTx
@@ -47,12 +48,13 @@ const mutations = {
         const { tlTx, rawTx } = payload;
         const index = state.txs.findIndex(tx => tx.rawTx === rawTx);
         state.txs[index].tlTx = tlTx;
+        state.txs = [...state.txs];
     },
     setTxStatus: (state, payload) => {
         const { message, rawTx } = payload;
         const index = state.txs.findIndex(tx => tx.rawTx === rawTx);
         state.txs[index].message = message;
-
+        state.txs = [...state.txs];
     },
     setTxNotification: (state, notification) => state.txNotification = notification,
 };
