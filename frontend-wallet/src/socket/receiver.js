@@ -113,14 +113,14 @@ export default class Receiver {
 }
 
 export class TokenForTokenTradeReceiver extends Receiver {
-    constructor(listenerURL) {
+    constructor(listenerURL, options) {
         super(listenerURL);
-        this.receiverAddress = 'QbbqvDj2bJkeZAu4yWBuQejDd86bWHtbXh'
+        this.receiverAddress = options.fromAddress;
         this.tradeOptions = { 
-            offerTokenId: 4,
-            offerTokenAmount: '0.003', 
-            wantedTokenId: 5,
-            wantedTokenAmount: '0.0156' ,
+            offerTokenId: options.propsIdForSale,
+            offerTokenAmount: options.amountForSale, 
+            wantedTokenId: options.propsIdDesired,
+            wantedTokenAmount: options.amountDesired,
         };
     }
 
@@ -181,7 +181,7 @@ export class TokenForTokenTradeReceiver extends Receiver {
         if (logs) console.log(`Building Token/Token Trade`);
         const bbRes = await rpcApis.asyncTL('getBestBlock');
         if (bbRes.error || !bbRes.data || !bbRes.data.height) return this.emitError(bbRes.error || `Error with getting best block`);
-        const nAddBlocks = 5
+        const nAddBlocks = 10
         const height = bbRes.data.height + nAddBlocks;
         if (logs) console.log(`Best Block: ${bbRes.data.height} - exp.Block : ${height}`);
 
@@ -218,14 +218,14 @@ export class TokenForTokenTradeReceiver extends Receiver {
 }
 
 export class LTCInstantTradeReceiver extends Receiver {
-    constructor(listenerURL) {
+    constructor(listenerURL, options) {
         super(listenerURL);
-        this.receiverAddress = 'QbbqvDj2bJkeZAu4yWBuQejDd86bWHtbXh'
+        this.receiverAddress = options.fromAddress;
         this.tradeOptions = {
             tradeType: TradeTypes.LTC_INSTANT,
-            wantedTokenId: 5,
-            wantedTokenAmount: '0.0156',
-            totalPrice: '0.0001',
+            wantedTokenId: options.propsIdDesired,
+            wantedTokenAmount: options.amountDesired,
+            totalPrice: options.ltcAmunt,
         };
     }
 
@@ -271,7 +271,7 @@ export class LTCInstantTradeReceiver extends Receiver {
         if (logs) console.log(`Building LTC Instant Trade`);
         const bbRes = await rpcApis.asyncTL('getBestBlock');
         if (bbRes.error || !bbRes.data || !bbRes.data.height) return this.emitError(bbRes.error || `Error with getting best block`);
-        const nAddBlocks = 5
+        const nAddBlocks = 10
         const height = bbRes.data.height + nAddBlocks;
         if (logs) console.log(`Best Block: ${bbRes.data.height} - exp.Block : ${height}`);
         const cpitOptions = [

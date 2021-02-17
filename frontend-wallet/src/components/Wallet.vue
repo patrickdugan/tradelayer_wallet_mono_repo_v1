@@ -32,6 +32,8 @@
               <md-option :value="this.txnTypeEnum.CUSTOM_PAYLOAD">Custom Payload</md-option>
               <md-option :value="this.txnTypeEnum.BUY_CONTRACT">Buy</md-option>
               <md-option :value="this.txnTypeEnum.SELL_CONTRACT">Sell</md-option>
+              <md-option :value="this.txnTypeEnum.LTC_INSTANT_TRADE">LTC Instant Trade</md-option>
+              
             </md-select>
           </md-field>
         </div>
@@ -92,6 +94,34 @@
         </div>
       </div>
 
+      <div v-if="txnType === txnTypeEnum.LTC_INSTANT_TRADE">
+        <div class="form-group">
+           <md-field v-if='!useCustomTXO'>
+            <label>Sender Address:</label>
+            <md-input required v-model='fromAddress'></md-input>
+            <span class="md-helper-text pointer" v-on:click='copyWalletAddress()'>(Use wallet address)</span>
+          </md-field>
+           <div style='display:flex; justify-content: space-between'>
+          <md-field style='width: 60%'>
+            <label>Wanted Token:</label>
+            <md-select disabled :value="selectedToken">
+              <md-option :value="4">Wood</md-option>
+              <md-option :value="5">Gold </md-option>
+            </md-select>
+          </md-field>
+          <md-field style='width:30%'>
+            <label>Quantity:</label>
+            <md-input disabled type='number' :value="amount1"></md-input>
+          </md-field>
+          </div>
+          <div style='display:flex; justify-content: space-between'>
+          <md-field style='width:100%'>
+            <label>LTC amount:</label>
+            <md-input disabled type='number' :value="amount2"></md-input>
+          </md-field>
+        </div>
+        </div>
+      </div>
       <div v-if="(txnType === txnTypeEnum.BUY_CONTRACT || txnType === txnTypeEnum.SELL_CONTRACT) && selectedContract.id">
         <div class='form-group'>
           <md-field v-if='!useCustomTXO'>
@@ -133,7 +163,7 @@
       <div>
 
           <md-button
-            v-if="(txnType === txnTypeEnum.BUY_CONTRACT || txnType === txnTypeEnum.SELL_CONTRACT) && selectedContract.id"
+            v-if="(txnType === txnTypeEnum.BUY_CONTRACT || txnType === txnTypeEnum.SELL_CONTRACT || txnType === txnTypeEnum.LTC_INSTANT_TRADE) && selectedContract.id"
             md-button 
             class='md-accent md-raised' 
             v-on:click="handleBuildRawTx()" 
@@ -204,7 +234,7 @@ export default {
       "unSignedRawTx",
       "signedRawTx",
     ]),
-    ...mapGetters("wallet", ["addressGetter", "currentAddressLTCBalance", "amount1", "amount2"]),
+    ...mapGetters("wallet", ["addressGetter", "currentAddressLTCBalance", "amount1", "amount2", 'selectedToken']),
     ...mapState("contracts", ["selectedContract"]),
 
     txnType: {
@@ -237,6 +267,8 @@ export default {
     },
     isDisabled() {
       switch (this.currentTxnType) {
+        case txnTypeEnum.LTC_INSTANT_TRADE:
+          return !this.selectedToken || !this.fromAddress || !this.amount1 || !this.amount2
         case txnTypeEnum.CUSTOM_PAYLOAD:
           return !this.customTxInput || !this.vOut || !this.toAddress || !this.payload
         case txnTypeEnum.SIMPLE_SEND:
@@ -289,6 +321,8 @@ export default {
         case txnTypeEnum.SELL_CONTRACT:
           this.handleBuySellSubmit();
           break;
+        case txnTypeEnum.LTC_INSTANT_TRADE:
+          this.handleLTCInstantSubmit();
         default:
           break;
       }
@@ -317,7 +351,16 @@ export default {
         const propsIdDesired = this.txnType === txnTypeEnum.SELL_CONTRACT ? sc.propsIdDesired : sc.propsIdForSale;
         const amountForSale = this.txnType === txnTypeEnum.SELL_CONTRACT ? this.amount1 : this.amount2
         const amountDesired = this.txnType === txnTypeEnum.SELL_CONTRACT ? this.amount2 : this.amount1
-        this.createSocketTrade({ propsIdDesired, propsIdForSale, amountForSale, amountDesired, fromAddress })
+        const type = this.currentTxnType
+        this.createSocketTrade({ type, propsIdDesired, propsIdForSale, amountForSale, amountDesired, fromAddress })
+    },
+    handleLTCInstantSubmit() {
+      const fromAddress = this.fromAddress;
+      const propsIdDesired = parseInt(this.selectedToken);
+      const amountDesired = this.amount1;
+      const ltcAmunt = this.amount2;
+      const type = this.currentTxnType
+      this.createSocketTrade({ type, fromAddress, propsIdDesired, amountDesired, ltcAmunt})
     }
   //   handleLTCSubmit() {
   //     if (this.currentTxnType !== txnTypeEnum.LTC_SEND)return

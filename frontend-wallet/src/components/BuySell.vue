@@ -10,7 +10,7 @@
                   : "Please select Contract"
                 }}
               </md-card-header>
-               <md-card-content>
+               <md-card-content v-if='scType === "pairContract"'>
                    <md-field>
                         <label for="quantity">{{selectedContract.propsNameForSale}}</label>
                         <md-input name="quantity" id="quantity" v-model="form.quantity" />
@@ -33,6 +33,26 @@
                     <span style="color:red">{{message}}</span>
                   </div> -->
             </md-card-content>
+            <md-card-content v-if='scType === "LTC_instant"'>
+                   <md-field>
+                        <label for="movie">Token</label>
+                        <md-select v-model="formLTCINSTANT.selectedToken" name="token" id="token">
+                          <md-option value='4'>Wood</md-option>
+                          <md-option value='5'>Gold</md-option>
+                        </md-select>
+                    </md-field>
+                   <md-field>
+                      <label for="price">Amount</label>
+                      <md-input name="quntity"  v-model="formLTCINSTANT.amount" />
+                    </md-field>
+                      <md-field>
+                        <label for="price">LTC amount</label>
+                      <md-input name="price" v-model="formLTCINSTANT.ltc" />
+                    </md-field>
+                  <div class="md-layout-item">
+                    <button @click="handleWalletBuy" class='md-raised mycolors-buy animated rubberBand delay-3s'>Buy</button>
+                  </div>
+            </md-card-content>
           </md-card>
      </div>
    </div>
@@ -48,8 +68,14 @@ const {txnTypeEnum} = walletService
 export default {
   name: 'BuySell',
   data: () => ({
+    scType: null,
     txid: null,
     sending: false,
+    formLTCINSTANT: {
+      selectedToken: null,
+      amount: 0,
+      ltc: 0,
+    },
     form: {
       orderType: null,
       quantity: 0,
@@ -87,6 +113,13 @@ export default {
   created () {
   },
   watch: {
+    selectedContract: {
+      immediate: true,
+      handler() {
+        console.log(this.selectedContract.type);
+        this.scType = this.selectedContract.type
+      }
+    },
     selectedOrder: {
       immediate: true,
       handler() {
@@ -104,7 +137,7 @@ export default {
   },
   methods: {
     ...mapActions('contracts', ['buyContracts', 'sellContracts', 'postCancelTrades', 'addPendingTXID', 'asyncGetTokenAmount']),
-    ...mapMutations('wallet', ['setBuyOrSellContract']),
+    ...mapMutations('wallet', ['setBuyOrSellContract', 'setLTCInstantContract']),
 
     async handleMaxValue() {
       const balance = await this.asyncGetTokenAmount(this.selectedOrder.propertyId)
@@ -123,12 +156,32 @@ export default {
       }
     },
     handleWalletBuy(){
-        const { form, selectedContract, setBuyOrSellContract } = this
+      switch (this.scType) {
+        case 'pairContract':
+          this.handleBuySellTrade();
+          break;
+        case 'LTC_instant':
+          this.handleLTCInstantTrade()
+          break;
+        default:
+          break;
+      }
+    },
+    handleBuySellTrade(){
+      const { form, selectedContract, setBuyOrSellContract } = this
       this.setBuyOrSellContract({
         txnType: txnTypeEnum.BUY_CONTRACT,
         quantity: form.quantity,
         price: form.price,
         contract: selectedContract 
+      })
+    },
+    handleLTCInstantTrade() {
+      this.setLTCInstantContract({
+        txnType: txnTypeEnum.LTC_INSTANT_TRADE,
+        selectedToken: this.formLTCINSTANT.selectedToken,
+        amount: this.formLTCINSTANT.amount,
+        ltcAmount: this.formLTCINSTANT.ltc,
       })
     },
     handleWalletSell(){

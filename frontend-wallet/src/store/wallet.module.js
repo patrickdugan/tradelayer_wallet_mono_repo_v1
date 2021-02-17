@@ -29,6 +29,7 @@ const state = {
   lastRawTx: '',
   lastTlTx: '',
   lastTxStatus: '',
+  selectedToken: 0,
 }
 
 // reusable helpers
@@ -273,6 +274,13 @@ const mutations = {
     state.currentTxnType = txnType
     state.contract = contract
     window.toggleWallet && window.toggleWallet()
+  },
+  setLTCInstantContract(state, { selectedToken, amount, ltcAmount, txnType}) {
+    state.selectedToken = selectedToken;
+    state.amount1 = amount;
+    state.amount2 = ltcAmount;
+    state.currentTxnType = txnType;
+    window.toggleWallet && window.toggleWallet()
   }
 }
 
@@ -294,6 +302,9 @@ const getters = {
   },
   amount2(state){
     return state.amount2
+  },
+  selectedToken(state) {
+    return state.selectedToken;
   },
   getBuildRawTxMessage(state) {
     console.log(state.buildRawTxMessage)

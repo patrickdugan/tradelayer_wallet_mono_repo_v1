@@ -100,6 +100,7 @@ const txnTypeEnum = {
   PROPOSE_CHANNEL: 5,
   SIMPLE_SEND: 6,
   CUSTOM_PAYLOAD: 7,
+  LTC_INSTANT_TRADE:8,
 }
 
 const buildRawTx = async (buildOptions) => {
