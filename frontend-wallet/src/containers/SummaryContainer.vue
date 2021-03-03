@@ -1,34 +1,11 @@
 <template>
   <div id="SummaryContainer">
-    <div class="md-layout-item" style="display:flex;">
-
-        <!-- <label for="selectedContract">Contract</label>
-        <md-select v-model="selectedContract" @md-selected="handleSelectedContract($event)">
-          <md-option value="ALL/USD">ALL/USD</md-option>
-          <md-option value="ALL/JPY">ALL/JPY</md-option>
-          <md-option value="ALL/LTC">ALL/LTC</md-option>
-          <md-option value="LTC/USD">LTC/USD</md-option>
-          <md-option value="LTC/JPY">LTC/JPY</md-option>
-        </md-select>
-       
-         <md-select v-model="selectedContract" @md-selected="handleSelectedContract($event)">
-          <md-option 
-          v-for="contract in contractsList"
-          v-bind:key="contract.name"
-          :value="contract.id"
-          >
-          {{contract.name}}
-          </md-option>
-        </md-select> -->
-    </div>
-      <div class="md-layout-item md-small-hide">
-        <md-tabs md-sync-route>
+        <md-tabs md-sync-route class='main-tabs'>
           <md-tab id="tab-summary" md-label="Trading" to="/Summary"></md-tab>
           <md-tab id="tab-portfolios" md-label="Portfolio" to="/Portfolio" md-disabled></md-tab>
           <md-tab id="tab-charts" md-label="Charts" to="/Charts" md-disabled></md-tab>
           <md-tab id="tab-taxes" md-label="Taxes" to="/Taxes" md-disabled></md-tab>
         </md-tabs>
-      </div>
     <SubMenu />
     <!-- <div class='contracts-list'>
           <div class="button-container" v-for="contract of contractsList" v-bind:key="contract.id">
@@ -269,6 +246,13 @@ export default {
 .md-field {
   width: 180px;
   margin: 0px 0px 0px 20px;
+}
+
+.main-tabs {
+  background-color: rgb(65, 65, 65);
+  padding-top: 1rem;
+  margin-top: -1rem;
+  box-shadow: 0 0 0.5rem black
 }
 
 @media only screen and (min-width: 960px) {
