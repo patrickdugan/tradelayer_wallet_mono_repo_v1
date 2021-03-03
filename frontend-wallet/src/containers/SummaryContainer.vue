@@ -29,8 +29,8 @@
           <md-tab id="tab-taxes" md-label="Taxes" to="/Taxes" md-disabled></md-tab>
         </md-tabs>
       </div>
-
-    <div class='contracts-list'>
+    <SubMenu />
+    <!-- <div class='contracts-list'>
           <div class="button-container" v-for="contract of contractsList" v-bind:key="contract.id">
           <md-button
             class='md-primary'
@@ -38,7 +38,7 @@
             {{ contract.propsNameForSale }}/{{ contract.propsNameDesired }}
           </md-button>
           </div>
-    </div>
+    </div> -->
     <div class="md-layout md-alignment-top-center">
       <div
         class="md-xsmall-hide md-small-hide md-layout-item md-small-size-100 md-medium-size-25 md-large-size-25"
@@ -161,6 +161,8 @@ import Active from "@/components/Active";
 import Pending from "@/components/Pending";
 import TradeChannels from "@/components/TradeChannels";
 import ContractBalances from "@/components/ContractBalances";
+import SubMenu from '@/components/SubMenu';
+
 // import Balances from '@/components/Balances'
 
 export default {
@@ -224,7 +226,8 @@ export default {
     Pending,
     HistoricalTradesbyAddress,
     TradeChannels,
-    ContractBalances
+    ContractBalances,
+    SubMenu
   }
 };
 </script>
