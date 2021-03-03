@@ -41,6 +41,10 @@ export default {
 </script>
 
 <style>
+
+.md-table {
+  box-shadow: 0 0 0.25rem black;
+}
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

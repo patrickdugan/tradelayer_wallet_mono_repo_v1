@@ -7,19 +7,8 @@
           <md-tab id="tab-taxes" md-label="Taxes" to="/Taxes" md-disabled></md-tab>
         </md-tabs>
     <SubMenu />
-    <!-- <div class='contracts-list'>
-          <div class="button-container" v-for="contract of contractsList" v-bind:key="contract.id">
-          <md-button
-            class='md-primary'
-            v-on:click="handleSelectedContract(contract.id)">
-            {{ contract.propsNameForSale }}/{{ contract.propsNameDesired }}
-          </md-button>
-          </div>
-    </div> -->
     <div class="md-layout md-alignment-top-center">
-      <div
-        class="md-xsmall-hide md-small-hide md-layout-item md-small-size-100 md-medium-size-25 md-large-size-25"
-      >
+      <div class="md-xsmall-hide md-small-hide md-layout-item md-small-size-100 md-medium-size-25 md-large-size-25">
         <md-table md-card>
           <md-card-header 
           style="height: 40px;" 
@@ -99,28 +88,30 @@
     </div>
 
     <div>
-      <md-tabs class="tabs-tight">
-        <md-tab
-          style="margin: 0px 0px -20px;"
-          id="tab-content-positions"
-          class
-          md-label="Positions"
-        >
-          <Positions />
-        </md-tab>
-        <md-tab id="tab-content-active-pos" class md-label="Active">
-          <Active />
-        </md-tab>
-        <md-tab id="tab-content-fills" class="tab-tight md-label-tight" md-label="Fills">
-          <HistoricalTradesbyAddress />
-        </md-tab>
-        <md-tab id="tab-content-pending" class="tab-tight md-label-tight" md-label="Pending">
-          <Pending />
-        </md-tab>
-         <md-tab id="tab-content-contractBalances" class="tab-tight md-label-tight" md-label="Balances">
-          <ContractBalances />
-        </md-tab>
-      </md-tabs>
+      <md-table>
+        <md-tabs class="tabs-tight">
+          <md-tab
+            style="margin: 0px 0px -20px;"
+            id="tab-content-positions"
+            class
+            md-label="Positions"
+          >
+            <Positions />
+          </md-tab>
+          <md-tab id="tab-content-active-pos" class md-label="Active">
+            <Active />
+          </md-tab>
+          <md-tab id="tab-content-fills" class="tab-tight md-label-tight" md-label="Fills">
+            <HistoricalTradesbyAddress />
+          </md-tab>
+          <md-tab id="tab-content-pending" class="tab-tight md-label-tight" md-label="Pending">
+            <Pending />
+          </md-tab>
+          <md-tab id="tab-content-contractBalances" class="tab-tight md-label-tight" md-label="Balances">
+            <ContractBalances />
+          </md-tab>
+        </md-tabs>
+      </md-table>
     </div>
   </div>
 </template>
@@ -210,7 +201,6 @@ export default {
 </script>
 
 <style scoped>
-
 .contracts-list {
   margin: 1.5rem 0 1rem 0;
   background-color: rgb(70, 70, 70);
