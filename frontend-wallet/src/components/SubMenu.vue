@@ -2,9 +2,9 @@
     <div class="menu-container">
         <div
             class="item"
-            :class="{ selected: selectedTab === tab.id }"
-            v-on:click="selectedTab = tab.id"
-            v-for="tab of tabsList" v-bind:key="tab.id"
+            :class="{ selected: getSelectedTab === tab.id }"
+            v-on:click="selectTab(tab.id)"
+            v-for="tab of getTabsList" v-bind:key="tab.id"
         >
             <img :src='tab.icon' />
             <span>{{ tab.name }}</span>
@@ -13,30 +13,15 @@
 </template>
 
 <script>
+import { mapActions, mapState, mapGetters, mapMutations } from 'vuex'
 export default {
     name: 'SubMenu',
-    data () {
-        return {
-            selectedTab: 1,
-            tabsList: [
-                {
-                    id: 1,
-                    name: 'LTC',
-                    icon: 'https://bitcoin-capital.bg/wp-content/uploads/2019/07/1920px-LTC-400-min-300x300.png'
-                },
-                {
-                    id: 2,
-                    name: 'USD',
-                    icon: 'https://cdn0.iconfinder.com/data/icons/mobile-device/512/dollar-usd-round-keyboard-money-usa-latin-2-512.png'
-                },
-                {
-                    id: 3,
-                    name: 'ALL',
-                    icon: 'https://image.flaticon.com/icons/png/512/566/566295.png'
-                },
-            ],
-        }
+    computed: {
+    ...mapGetters('contracts2', ['getTabsList', 'getSelectedTab']),
     },
+    methods: {
+        ...mapMutations('contracts2', ['selectTab']),
+    }
 }
 </script>
 
