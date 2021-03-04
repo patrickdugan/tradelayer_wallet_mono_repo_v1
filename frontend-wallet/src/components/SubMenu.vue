@@ -6,7 +6,9 @@
             v-on:click="selectTab(tab.id)"
             v-for="tab of getTabsList" v-bind:key="tab.id"
         >
-            <img :src='tab.icon' />
+            <div class="image" :class='{ allIcon: tab.id === 3 }' >
+                <img :src='tab.icon' alt />
+            </div>
             <span>{{ tab.name }}</span>
         </div>
     </div>
@@ -44,13 +46,20 @@ export default {
     .menu-container .item:hover {
         background: gray;
     }
-    .menu-container .item img {
+    .menu-container .item .image {
         width: 1.5rem;
         height: 1.5rem;
         margin-right: 0.5rem;
+        overflow: hidden;
     }
     .selected {
         border-top: 3px solid rgb(56, 103, 255);
     }
-
+    .allIcon {
+        background-color: rgb(41, 126, 183);
+        border-radius: 50%;
+    }
+    .allIcon img {
+        transform: scale(1.6);
+    }
 </style>

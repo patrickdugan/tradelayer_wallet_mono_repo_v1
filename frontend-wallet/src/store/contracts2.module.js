@@ -12,7 +12,7 @@ const tabsList = [
     {
         id: 3,
         name: 'ALL',
-        icon: 'https://image.flaticon.com/icons/png/512/566/566295.png'
+        icon: 'https://cdn.discordapp.com/attachments/749975407838888058/817037799739490344/ALLFancyLogo.png'
     },
 ];
 
