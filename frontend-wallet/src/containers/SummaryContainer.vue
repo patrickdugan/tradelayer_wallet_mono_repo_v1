@@ -7,11 +7,7 @@
           <md-tab id="tab-taxes" md-label="Taxes" to="/Taxes" md-disabled></md-tab>
         </md-tabs>
     <SubMenu />
-        <div class="md-layout md-alignment-top-center">
-          <div class='chart-container'>
-            <div id="chart"></div>
-          </div>
-        </div>
+    <MainChart />
     <div class="md-layout md-alignment-top-center">
       <div class="md-xsmall-hide md-small-hide md-layout-item md-small-size-100 md-medium-size-25 md-large-size-25">
         <md-table md-card>
@@ -135,8 +131,7 @@ import Pending from "@/components/Pending";
 import TradeChannels from "@/components/TradeChannels";
 import ContractBalances from "@/components/ContractBalances";
 import SubMenu from '@/components/SubMenu';
-import { createChart } from 'lightweight-charts';
-
+import MainChart from '@/components/MainChart';
 // import Balances from '@/components/Balances'
 
 export default {
@@ -174,9 +169,6 @@ export default {
       }
     }
   },
-  mounted () {
-    this.initChart();
-  },
   methods: {
     ...mapActions("contracts", ["setSelectedContract"]),
     ...mapActions("orderbook", ["getPairOrderBook", "selectOrder"]),
@@ -191,24 +183,6 @@ export default {
           this.getPairOrderBook(this.selectedContract)
         }
     },
-    initChart() {
-      const chart = createChart('chart');
-      const candlestickSeries = chart.addCandlestickSeries();
-    
-      const container = document.getElementById('chart');
-      window.addEventListener('resize', () => chart.resize(container.offsetWidth, container.offsetHeight));
-      const data = [];
-      candlestickSeries.setData(data);
-      setInterval(() => {
-        const open = Math.floor(Math.random() * 100);
-        const high = Math.floor(Math.random() * 100);
-        const low = Math.floor(Math.random() * 100);
-        const close = Math.floor(Math.random() * 100);
-        data.push({ time: Date.now(), open, high, low, close});
-        candlestickSeries.setData(data);
-        time++;
-      }, 1000)
-    }
   },
   components: {
     BuySell,
@@ -222,22 +196,13 @@ export default {
     HistoricalTradesbyAddress,
     TradeChannels,
     ContractBalances,
-    SubMenu
+    SubMenu,
+    MainChart,
   }
 };
 </script>
 
 <style scoped>
-.chart-container {
-  height: 20rem;
-  width: 100%;
-  padding: 1rem 3rem;
-  display: flex;
-  }
-  .chart-container #chart {
-    width: 100%;
-    height: 100%;
-  }
 .contracts-list {
   margin: 1.5rem 0 1rem 0;
   background-color: rgb(70, 70, 70);
