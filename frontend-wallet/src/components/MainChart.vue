@@ -7,31 +7,54 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
 import { createChart } from 'lightweight-charts';
 
 export default {
     name: "MainChart",
     mounted () {
+        this.feedBtc();
         this.initChart();
     },
-    methods: {
-        initChart() {
-        const chart = createChart('chart');
-        const candlestickSeries = chart.addCandlestickSeries();
-        
-        const container = document.getElementById('chart');
-        window.addEventListener('resize', () => chart.resize(container.offsetWidth, container.offsetHeight));
-        const data = [];
-        candlestickSeries.setData(data);
-        setInterval(() => {
-            const open = Math.floor(Math.random() * 100);
-            const high = Math.floor(Math.random() * 100);
-            const low = Math.floor(Math.random() * 100);
-            const close = Math.floor(Math.random() * 100);
-            data.push({ time: Date.now(), open, high, low, close});
-            candlestickSeries.setData(data);
-        }, 1000)
+    computed: {
+        ...mapGetters('prices', ['getRawBtcPrice'])
+    },
+    watch: {
+    getRawBtcPrice: function (value) {
+        if(!value) return;
+            this.candlestickSeries.setData(value);
         }
+    },
+    methods: {
+        ...mapActions("prices", ['feedBtc']),
+        initChart() {
+            const chartOptions = {
+                watermark: {
+                    color: '#E0E0E0',
+                    visible: true,
+                    text: 'TradeLayer',
+                    fontSize: 100,
+                },
+                layout: {
+                    backgroundColor: '#F5F5F5',
+                },
+                timeScale: {
+                    tickMarkFormatter: (a, b, c) => {
+                        const [month, date, year] = new Date().toLocaleDateString("en-US").split("/");
+                        const [hour, minute, second] = new Date(a * 1000).toLocaleTimeString("en-US").split(/:| /);
+                        const time = `${hour}:${minute}:${second}`
+                        return a ? time : 'error'
+                    }
+                }
+            };
+            
+            const chart = createChart('chart', chartOptions);
+            const candlestickSeries = chart.addCandlestickSeries();
+            const container = document.getElementById('chart');
+            window.addEventListener('resize', () => chart.resize(container.offsetWidth, container.offsetHeight));
+            this.candlestickSeries = candlestickSeries;
+        },
+
     }
 }
 </script>
