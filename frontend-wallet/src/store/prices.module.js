@@ -12,7 +12,7 @@ const actions = {
             "method" : "public/get_tradingview_chart_data",
             "params" : {
               "instrument_name" : "BTC-PERPETUAL",
-              "start_timestamp" : 0,
+              "start_timestamp" : new Date().getTime() - 86400000 * 7,
               "end_timestamp" : new Date().getTime(),
               "resolution" : "1"
             }
@@ -24,7 +24,7 @@ const actions = {
                     let feed = [];
                     if (!data.result.ticks.length) return;
                 for (let i = 0; i < data.result.ticks.length; i++) {
-                    const time = data.result.ticks[i] / 1000
+                    const time = data.result.ticks[i] / 1000;
                     const open = data.result.open[i];
                     const high = data.result.high[i]
                     const low =  data.result.low[i];
@@ -38,12 +38,26 @@ const actions = {
             }
         };
         ws.onopen = () => ws.send(JSON.stringify(initMsg));
+        setInterval(() => {
+            const msg = {
+                "jsonrpc" : "2.0",
+                "id" : 833,
+                "method" : "public/get_tradingview_chart_data",
+                "params" : {
+                  "instrument_name" : "BTC-PERPETUAL",
+                  "start_timestamp" : new Date().getTime() - 36000,
+                  "end_timestamp" : new Date().getTime(),
+                  "resolution" : "1"
+                }
+            };
+            ws.send(JSON.stringify(msg))
+        }, 10000);
     }
 };
  
 const mutations = {
     addToData: (state, payload) => {
-          state.rawBtcPrice = [...payload];
+          state.rawBtcPrice = [...state.rawBtcPrice, ...payload];
     },
 };
 
