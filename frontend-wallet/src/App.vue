@@ -1,10 +1,16 @@
 <template>
   <div id="app" class="page-container md-layout-column">
     <Toolbar @toggleNavigation='showNavigation = !showNavigation' />
+    <md-tabs md-sync-route class='main-tabs'>
+          <md-tab id="tab-summary" md-label="Trading" to="/Summary"></md-tab>
+          <md-tab id="tab-portfolios" md-label="Portfolio" to="/Portfolio" md-disabled></md-tab>
+          <md-tab id="tab-charts" md-label="Charts" to="/Charts" md-disabled></md-tab>
+          <md-tab id="tab-taxes" md-label="Taxes" to="/Taxes" md-disabled></md-tab>
+        </md-tabs>
+    <SubMenu />
     <md-drawer id="wallet-container" class="md-left" :md-active.sync="showWallet">
       <Wallet />
     </md-drawer>
-
     <md-drawer class="md-left" :md-active.sync="showNavigation">
       <Navigation @close-navigation='showNavigation = false;' />
     </md-drawer>
@@ -17,6 +23,7 @@
 import Toolbar from "@/components/Toolbar"
 import Wallet from "@/components/Wallet";
 import Navigation from "@/components/Navigation"
+import SubMenu from '@/components/SubMenu';
 
 export default {
   name: "App",
@@ -24,6 +31,7 @@ export default {
     Wallet,
     Navigation,
     Toolbar,
+    SubMenu,
   },
   data: () => ({
     showNavigation: false,

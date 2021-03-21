@@ -1,13 +1,6 @@
 <template>
   <div id="SummaryContainer">
-        <md-tabs md-sync-route class='main-tabs'>
-          <md-tab id="tab-summary" md-label="Trading" to="/Summary"></md-tab>
-          <md-tab id="tab-portfolios" md-label="Portfolio" to="/Portfolio" md-disabled></md-tab>
-          <md-tab id="tab-charts" md-label="Charts" to="/Charts" md-disabled></md-tab>
-          <md-tab id="tab-taxes" md-label="Taxes" to="/Taxes" md-disabled></md-tab>
-        </md-tabs>
-    <SubMenu />
-    <MainChart />
+    <!-- <MainChart /> -->
     <div class="md-layout md-alignment-top-center">
       <div class="md-xsmall-hide md-small-hide md-layout-item md-small-size-100 md-medium-size-25 md-large-size-25">
         <md-table md-card>
@@ -130,58 +123,25 @@ import Active from "@/components/Active";
 import Pending from "@/components/Pending";
 import TradeChannels from "@/components/TradeChannels";
 import ContractBalances from "@/components/ContractBalances";
-import SubMenu from '@/components/SubMenu';
 import MainChart from '@/components/MainChart';
 // import Balances from '@/components/Balances'
 
 export default {
   name: "SummaryContainer",
-  data() {
-    return {
-      selectedContract: {},
-      selectedContractNew: "",
-      contractsList: [
-        {
-          id:   1,
-          propsNameForSale: 'Wood',
-          propsNameDesired: 'Gold',
-          propsIdForSale: 4,
-          propsIdDesired: 5,
-          type: "pairContract",
-        },
-        {
-          id:   2,
-          propsNameForSale: 'LTC',
-          propsNameDesired: 'XYZ',
-          type: "LTC_instant",
-        },
-      ]
-    };
-  },
   computed: {
-    ...mapGetters("contracts", ["selectedContractGetter"])
+    ...mapGetters("markets", ["getSelectedMarket"])
   },
    watch: {
-    selectedContractGetter: {
+    getSelectedMarket: {
       immediate: true,
       handler() {
-        this.handleOrderBook()
+        this.handleSelectedMarket()
       }
     }
   },
   methods: {
-    ...mapActions("contracts", ["setSelectedContract"]),
-    ...mapActions("orderbook", ["getPairOrderBook", "selectOrder"]),
-    handleSelectedContract(value) {
-      const pair = this.contractsList.find(e => e.id === value)
-      console.log(`Selecting contract with ID: ${pair.id}, Name: ${pair.name}`);
-      this.setSelectedContract({selectedContract: pair});
-      this.selectOrder({})
-    },
-    handleOrderBook() {
-        if (this.selectedContractGetter.type === "pairContract") {
-          this.getPairOrderBook(this.selectedContract)
-        }
+    handleSelectedMarket() {
+      // console.log(`Selecting Market with ID: ${this.getSelectedMarket.id}, Name: ${this.getSelectedMarket.pair}`);
     },
   },
   components: {
@@ -196,7 +156,6 @@ export default {
     HistoricalTradesbyAddress,
     TradeChannels,
     ContractBalances,
-    SubMenu,
     MainChart,
   }
 };
