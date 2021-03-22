@@ -10,7 +10,7 @@ import { loading } from './loading.module'
 import { wallet } from './wallet.module'
 import { channelsTrade } from './channelsTrade.module'
 import { markets } from './markets.module'
-import { trades } from './trades.module'
+import { txns } from './txns.module'
 
 import { prices } from './prices.module'
 
@@ -27,7 +27,7 @@ export const store = new Vuex.Store({
     wallet,
     channelsTrade,
     markets,
-    trades,
+    txns,
     prices
   }
 })

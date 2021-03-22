@@ -1,11 +1,15 @@
-const TradeTypes = {
+export const txnType = {
     LTC_INSTANT: 'LTC_INSTANT',
     TOKEN_TOKEN: 'TOKEN_TOKEN',
 }
 
-const state = {};
+const state = {
+    selectedTxnType: txnType.TOKEN_TOKEN,
+};
 
-const getters = {};
+const getters = {
+    getSelectedTxnType: (state) => state.selectedTxnType,
+};
 
 const actions = { 
     initTrade({ dispatch, commit, rootState }, options) {
@@ -29,9 +33,13 @@ const actions = {
     },
 };
 
-const mutations = {};
+const mutations = {
+    setSelectedTxnType(state, type) {
+        state.selectedTxnType = type;
+    },
+};
 
-export const trades = {
+export const txns = {
     namespaced: true,
     state,
     getters,

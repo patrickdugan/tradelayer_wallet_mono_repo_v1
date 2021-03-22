@@ -92,15 +92,18 @@ const getSendIssuancePeggedPayload = (qty, name, contractID) =>{
 }
 
 const txnTypeEnum = {
-  LTC_SEND: 0,
-  BUY_CONTRACT: 1,
-  SELL_CONTRACT: 2,
-  ISSUE_CURRENCY: 3,
-  REDEEM_CURRENCY: 4,
-  PROPOSE_CHANNEL: 5,
-  SIMPLE_SEND: 6,
-  CUSTOM_PAYLOAD: 7,
-  LTC_INSTANT_TRADE:8,
+  TOKEN_TOKEN: 0,
+  LTC_INSTANT: 1,
+
+  // LTC_SEND: 0,
+  // BUY_CONTRACT: 1,
+  // SELL_CONTRACT: 2,
+  // ISSUE_CURRENCY: 3,
+  // REDEEM_CURRENCY: 4,
+  // PROPOSE_CHANNEL: 5,
+  // SIMPLE_SEND: 6,
+  // CUSTOM_PAYLOAD: 7,
+  // LTC_INSTANT_TRADE:8,
 }
 
 const buildRawTx = async (buildOptions) => {

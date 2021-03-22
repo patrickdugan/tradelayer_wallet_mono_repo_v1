@@ -12,7 +12,7 @@ const state = {
   walletDec: localWalletDec ? JSON.parse(localWalletDec) : [],
   currentAddressIndex: 0,
   utxoArray: [],
-  currentTxnType: txnTypeEnum.CUSTOM_PAYLOAD,
+  // currentTxnType: txnTypeEnum.,
   price: 0,
   sats: 0,
   toAddress: "",
@@ -21,15 +21,15 @@ const state = {
   quantity: 0,
   channelPrice: 0,
   channelBalance: 0,
-  buildRawTxMessage: '',
-  unSignedRawTx: '',
-  signedRawTx:'',
-  amount1: 32,
-  amount2: 32,
-  lastRawTx: '',
-  lastTlTx: '',
-  lastTxStatus: '',
-  selectedToken: 0,
+  // buildRawTxMessage: '',
+  // unSignedRawTx: '',
+  // signedRawTx:'',
+  // amount1: 32,
+  // amount2: 32,
+  // lastRawTx: '',
+  // lastTlTx: '',
+  // lastTxStatus: '',
+  // selectedToken: 0,
 }
 
 // reusable helpers
@@ -70,77 +70,77 @@ const addKeyPairToState = (state, keyPair, password) => {
 }
 
 const actions = {
-  async createCustomRawTx({ commit, state }, txBuildOptions){
-    const buildRawTxResult = await walletService.buildRawTx(txBuildOptions);
-    const { data, error } = buildRawTxResult;
-    if (error) commit('setRawTxMessage', `Error: ${error}`)
-    if (data) {
-      commit('setRawTxMessage', data);
-      const decodedRawTx = await walletService.decodeRawTx(data);
-      const { decodedRawTxData, decodedRawTxError } = decodedRawTx;
-      if (!decodedRawTxError) {
-        commit('setUnsignedRawTx', data);
-      }
-    }
-    return buildRawTxResult;
-  },
+  // async createCustomRawTx({ commit, state }, txBuildOptions){
+  //   const buildRawTxResult = await walletService.buildRawTx(txBuildOptions);
+  //   const { data, error } = buildRawTxResult;
+  //   if (error) commit('setRawTxMessage', `Error: ${error}`)
+  //   if (data) {
+  //     commit('setRawTxMessage', data);
+  //     const decodedRawTx = await walletService.decodeRawTx(data);
+  //     const { decodedRawTxData, decodedRawTxError } = decodedRawTx;
+  //     if (!decodedRawTxError) {
+  //       commit('setUnsignedRawTx', data);
+  //     }
+  //   }
+  //   return buildRawTxResult;
+  // },
 
-  async signRawTx({ commit, state }, unsignedRawTx) {
-    const signRawTxResult = await walletService.signRawTx(unsignedRawTx);
-    const { data, error } = signRawTxResult;
-    if (error) commit('setRawTxMessage', `Error: ${error}`)
-    if (data) {
-      if (!data.complete) {
-        commit('setRawTxMessage', `Error: Undefined Error with signing tx`)
-      } else {
-        commit('setRawTxMessage', data.hex)
-        commit('setSignedRawTx', data.hex)
-      }
-    }
-    return signRawTxResult;
-  },
+  // async signRawTx({ commit, state }, unsignedRawTx) {
+  //   const signRawTxResult = await walletService.signRawTx(unsignedRawTx);
+  //   const { data, error } = signRawTxResult;
+  //   if (error) commit('setRawTxMessage', `Error: ${error}`)
+  //   if (data) {
+  //     if (!data.complete) {
+  //       commit('setRawTxMessage', `Error: Undefined Error with signing tx`)
+  //     } else {
+  //       commit('setRawTxMessage', data.hex)
+  //       commit('setSignedRawTx', data.hex)
+  //     }
+  //   }
+  //   return signRawTxResult;
+  // },
 
-  async sendRawTx({commit, state }, signedRawTx) {
-    const sendRawTxResult = await walletService.sendRawTx(signedRawTx);
-    const { data, error } = sendRawTxResult;
-    if (error) commit('setRawTxMessage', `Error: ${JSON.stringify(error)}`);
-    if (data) commit('setRawTxMessage', data);
-    return sendRawTxResult;
-  },
+  // async sendRawTx({commit, state }, signedRawTx) {
+  //   const sendRawTxResult = await walletService.sendRawTx(signedRawTx);
+  //   const { data, error } = sendRawTxResult;
+  //   if (error) commit('setRawTxMessage', `Error: ${JSON.stringify(error)}`);
+  //   if (data) commit('setRawTxMessage', data);
+  //   return sendRawTxResult;
+  // },
 
-  async createSimpleSendRawTx({commit, dispatch, state }, txBuildOptions) {
-    const { customTxInput, vOut, toAddress, fromAddress, propertyId, quantity, } = txBuildOptions;
-    const payload = await walletService.createSimpleSendPayload({propertyId, quantity});
-    const payLoadData = payload.data;
-    const payloadError = payload.error;
-    if (payloadError) return commit('setRawTxMessage', `Error: ${JSON.stringify(payloadError)}`);
+  // async createSimpleSendRawTx({commit, dispatch, state }, txBuildOptions) {
+  //   const { customTxInput, vOut, toAddress, fromAddress, propertyId, quantity, } = txBuildOptions;
+  //   const payload = await walletService.createSimpleSendPayload({propertyId, quantity});
+  //   const payLoadData = payload.data;
+  //   const payloadError = payload.error;
+  //   if (payloadError) return commit('setRawTxMessage', `Error: ${JSON.stringify(payloadError)}`);
 
-    if (fromAddress) {
-      const validateAddress = await walletService.validateAddress(fromAddress);
-      if (validateAddress.error) return commit('setRawTxMessage', `Error: ${JSON.stringify(validateAddress.error)}`);
-      if (!validateAddress.data.isvalid) return commit('setRawTxMessage', `Error: Address is not valid`);
-      if (validateAddress.data.isvalid) {
-        const result = await walletService.getUTXOs2(fromAddress)
-        const bestUnspent = result.txs.find(tx => parseFloat(tx.value) > 0.0004);
-        if (!bestUnspent) return commit('setRawTxMessage', `Error: Not enaugh balance in this address`);
-        const txBuildOptions = {
-          customTxInput: bestUnspent.txid,
-          vOut: bestUnspent.output_no,
-          toAddress: toAddress,
-          payload: payLoadData,
-        }
-        dispatch('createCustomRawTx', txBuildOptions)
-      }
-    } else if (customTxInput && vOut) {
-      const txBuildOptions = {
-        customTxInput: customTxInput,
-        vOut: vOut,
-        toAddress: toAddress,
-        payload: payLoadData,
-      }
-      dispatch('createCustomRawTx', txBuildOptions)
-    }
-  },
+  //   if (fromAddress) {
+  //     const validateAddress = await walletService.validateAddress(fromAddress);
+  //     if (validateAddress.error) return commit('setRawTxMessage', `Error: ${JSON.stringify(validateAddress.error)}`);
+  //     if (!validateAddress.data.isvalid) return commit('setRawTxMessage', `Error: Address is not valid`);
+  //     if (validateAddress.data.isvalid) {
+  //       const result = await walletService.getUTXOs2(fromAddress)
+  //       const bestUnspent = result.txs.find(tx => parseFloat(tx.value) > 0.0004);
+  //       if (!bestUnspent) return commit('setRawTxMessage', `Error: Not enaugh balance in this address`);
+  //       const txBuildOptions = {
+  //         customTxInput: bestUnspent.txid,
+  //         vOut: bestUnspent.output_no,
+  //         toAddress: toAddress,
+  //         payload: payLoadData,
+  //       }
+  //       dispatch('createCustomRawTx', txBuildOptions)
+  //     }
+  //   } else if (customTxInput && vOut) {
+  //     const txBuildOptions = {
+  //       customTxInput: customTxInput,
+  //       vOut: vOut,
+  //       toAddress: toAddress,
+  //       payload: payLoadData,
+  //     }
+  //     dispatch('createCustomRawTx', txBuildOptions)
+  //   }
+  // },
   
   // todo: call after new address is added
   setCurrentAddress({ commit, state }, index) {
@@ -167,30 +167,30 @@ const actions = {
   }
 }
 const mutations = {
-  setLastTlTx(state, hex) {
-    state.lastTlTx = hex
-  },
+  // setLastTlTx(state, hex) {
+  //   state.lastTlTx = hex
+  // },
 
-  setLastRawTx(state, hex) {
-    state.lastRawTx = hex
-  },
+  // setLastRawTx(state, hex) {
+  //   state.lastRawTx = hex
+  // },
 
-  setLastTxStatus(state, status) {
-    state.lastTxStatus = status
-  },
+  // setLastTxStatus(state, status) {
+  //   state.lastTxStatus = status
+  // },
 
-  setSignedRawTx(state, tx) {
-    state.signedRawTx = tx;
-  },
+  // setSignedRawTx(state, tx) {
+  //   state.signedRawTx = tx;
+  // },
 
-  setUnsignedRawTx(state, tx) {
-    state.unSignedRawTx = tx;
-  },
+  // setUnsignedRawTx(state, tx) {
+  //   state.unSignedRawTx = tx;
+  // },
 
-  setRawTxMessage(state,message) {
-    state.buildRawTxMessage = message
-  },
-  // creates random wifkey (could be better named)
+  // setRawTxMessage(state,message) {
+  //   state.buildRawTxMessage = message
+  // },
+
   addKeyPair(state, { password, next, error }) {
     if (decryptWalletExtracted(state, password)) {
       const keyPair = generateKeyPair()
@@ -268,48 +268,48 @@ const mutations = {
     window.toggleWallet && window.toggleWallet()
 
   },
-  setBuyOrSellContract(state, { quantity, price, txnType, contract }) {
-    state.amount1 = quantity
-    state.amount2 = price
-    state.currentTxnType = txnType
-    state.contract = contract
-    window.toggleWallet && window.toggleWallet()
-  },
-  setLTCInstantContract(state, { selectedToken, amount, ltcAmount, txnType}) {
-    state.selectedToken = selectedToken;
-    state.amount1 = amount;
-    state.amount2 = ltcAmount;
-    state.currentTxnType = txnType;
-    window.toggleWallet && window.toggleWallet()
-  }
+  // setBuyOrSellContract(state, { quantity, price, txnType, contract }) {
+  //   state.amount1 = quantity
+  //   state.amount2 = price
+  //   state.currentTxnType = txnType
+  //   state.contract = contract
+  //   window.toggleWallet && window.toggleWallet()
+  // },
+  // setLTCInstantContract(state, { selectedToken, amount, ltcAmount, txnType}) {
+  //   state.selectedToken = selectedToken;
+  //   state.amount1 = amount;
+  //   state.amount2 = ltcAmount;
+  //   state.currentTxnType = txnType;
+  //   window.toggleWallet && window.toggleWallet()
+  // }
 }
 
 const getters = {
-  lastTlTx(state) {
-    return state.lastTlTx
-  },
+  // lastTlTx(state) {
+  //   return state.lastTlTx
+  // },
 
-  lastRawTx(state) {
-    return state.lastRawTx
-  },
+  // lastRawTx(state) {
+  //   return state.lastRawTx
+  // },
 
-  lastTxStatus(state) {
-    return state.lastTxStatus
-  },
+  // lastTxStatus(state) {
+  //   return state.lastTxStatus
+  // },
 
-  amount1(state){
-    return state.amount1
-  },
-  amount2(state){
-    return state.amount2
-  },
-  selectedToken(state) {
-    return state.selectedToken;
-  },
-  getBuildRawTxMessage(state) {
-    console.log(state.buildRawTxMessage)
-    return state.buildRawTxMessage;
-  },
+  // amount1(state){
+  //   return state.amount1
+  // },
+  // amount2(state){
+  //   return state.amount2
+  // },
+  // selectedToken(state) {
+  //   return state.selectedToken;
+  // },
+  // getBuildRawTxMessage(state) {
+  //   console.log(state.buildRawTxMessage)
+  //   return state.buildRawTxMessage;
+  // },
   walletCountDisplay(state) {
     const count = state.walletDec.length
     switch (count) {

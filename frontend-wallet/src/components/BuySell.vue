@@ -20,12 +20,12 @@
             </md-card-content>
             <div class='buttons'>
               <button
-                v-if='this.selectedMarketTypeName !== "LTC" && this.selectedMarketTypeName !== "USD"'
                 @click="handleBuySell('BUY')"
                 :disabled='!amount || !price'
                 class='md-raised mycolors-buy animated rubberBand delay-3s'
               >Buy</button>
               <button
+                v-if='this.selectedMarketTypeName !== "LTC" && this.selectedMarketTypeName !== "USD"'
                 @click="handleBuySell('SELL')"
                 :disabled='!amount || !price'
                 class='md-raised mycolors-sell animated rubberBand delay-3s'
@@ -64,9 +64,9 @@ export default {
     },
   },  
   methods: {
-    ...mapActions('trades', ['initTrade']),
+    ...mapActions('txns', ['initTrade']),
     handleBuySell (action) {
-      if (!this.isNumber(this.amount) || !this.isNumber(this.price)) {
+      if (!this.isValid(this.amount) || !this.isValid(this.price)) {
         this.hasError = true
         return;
       }
@@ -80,8 +80,10 @@ export default {
       this.initTrade(tradeOptions)
       this.hasError = false;
     },
-    isNumber(value) {
-      return !isNaN(value) && !isNaN(parseFloat(value));
+    isValid(value) {
+      const isNumber = !isNaN(value) && !isNaN(parseFloat(value));
+      const between = parseFloat(value) > 0;
+      return isNumber && between
     },
     clearInputs() {
       this.amount = null
