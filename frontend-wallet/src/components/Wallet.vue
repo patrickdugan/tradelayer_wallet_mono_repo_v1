@@ -27,194 +27,75 @@
         <div class='form-group'>
           <md-field>
             <md-select v-model="selectedTxnType" >
-              <!-- <md-option :value="this.txnTypeEnum.SIMPLE_SEND">Simple Send</md-option>
-              <md-option :value="this.txnTypeEnum.CUSTOM_PAYLOAD">Custom Payload</md-option>
-              <md-option :value="this.txnTypeEnum.BUY_CONTRACT">Buy</md-option>
-              <md-option :value="this.txnTypeEnum.SELL_CONTRACT">Sell</md-option> -->
               <md-option :value="txnType.LTC_INSTANT">LTC Instant Trade</md-option>
               <md-option :value="txnType.TOKEN_TOKEN">Token/Token Trade</md-option>
+              <md-option :value="txnType.USD_TRADE">USD Trade</md-option>
               
             </md-select>
           </md-field>
         </div>
   
       <div class='divider' />
-      
-      <!-- <div v-if="txnType === txnTypeEnum.SIMPLE_SEND">
-        <div class='form-group'>
-          <div class='check-boxes'>
-              <md-checkbox v-on:change="clearInputs()" v-model='useCustomTXO'>Use Custom Transaction Input</md-checkbox>
-          </div>
-          <md-field v-if='!useCustomTXO'>
-            <label>Sender Address:</label>
-            <md-input required v-model='fromAddress'></md-input>
-            <span class="md-helper-text pointer" v-on:click='copyWalletAddress()'>(Use wallet address)</span>
-          </md-field>
-          <md-field v-if='useCustomTXO'>
-            <label>Transaction Input:</label>
-            <md-input required v-model='customTxInput'></md-input>
-          </md-field>
-          <md-field v-if='useCustomTXO'>
-            <label>Input's vOut:</label>
-            <md-input required v-model='vOut' type='number'></md-input>
-          </md-field>
-          <md-field >
-            <label>Receiver Address:</label>
-            <md-input required v-model='toAddress'></md-input>
-          </md-field>
-          <md-field >
-            <label>Property ID: </label>
-            <md-input v-model='propertyId' required type='number'></md-input>
-          </md-field>
-          <md-field >
-            <label>Quantity: </label>
-            <md-input v-model='quantity' required type='number'></md-input>
-          </md-field>
+      <div class='form-group'>
+        <md-field>
+                <label>Sender Address:</label>
+                <md-input required v-model="senderAddress"></md-input>
+                <span class="md-helper-text pointer" v-on:click='copyWalletAddress()'>(Use wallet address)</span>
+        </md-field>
+        <div style='display:flex; justify-content: space-between'>
+            <md-field style='width:100%'>
+                <label>Amount:</label>
+                <md-input v-model='amountDesired'></md-input>
+                <span>{{ tokenDesired.name || getSelectedMarket.a.name }}</span>
+            </md-field>
+            </div>
+            <div style='display:flex; justify-content: space-between'>
+            <md-field style='width:100%'>
+                <label>Price: </label>
+                <md-input v-model='amountForSale'></md-input>
+                <span>{{ tokenForSale.name || getSelectedMarket.b.name }}</span>
+            </md-field>
         </div>
-      </div> -->
-
-      <!-- <div v-if="txnType === txnTypeEnum.CUSTOM_PAYLOAD">
-        <div class='form-group'>
-          <md-field >
-            <label>Transaction Input:</label>
-            <md-input v-model='customTxInput' required></md-input>
-          </md-field>
-          <md-field >
-            <label>Input's vOut:</label>
-            <md-input v-model='vOut' required type='number'></md-input>
-          </md-field>
-          <md-field >
-            <label>Refferance Address:</label>
-            <md-input v-model='toAddress' required></md-input>
-          </md-field>
-          <md-field >
-            <label>payload:</label>
-            <md-input v-model='payload' required></md-input>
-          </md-field>
-        </div>
-      </div> -->
-
-      <!-- <div v-if="txnType === txnTypeEnum.LTC_INSTANT_TRADE">
-        <div class="form-group">
-           <md-field v-if='!useCustomTXO'>
-            <label>Sender Address:</label>
-            <md-input required v-model='fromAddress'></md-input>
-            <span class="md-helper-text pointer" v-on:click='copyWalletAddress()'>(Use wallet address)</span>
-          </md-field>
-           <div style='display:flex; justify-content: space-between'>
-          <md-field style='width: 60%'>
-            <label>Wanted Token:</label>
-            <md-select disabled :value="selectedToken">
-              <md-option :value="4">Wood</md-option>
-              <md-option :value="5">Gold </md-option>
-            </md-select>
-          </md-field>
-          <md-field style='width:30%'>
-            <label>Quantity:</label>
-            <md-input disabled type='number' :value="amount1"></md-input>
-          </md-field>
-          </div>
-          <div style='display:flex; justify-content: space-between'>
-          <md-field style='width:100%'>
-            <label>LTC amount:</label>
-            <md-input disabled type='number' :value="amount2"></md-input>
-          </md-field>
-        </div>
-        </div>
-      </div> -->
-
-      <!-- <div v-if="(txnType === txnTypeEnum.BUY_CONTRACT || txnType === txnTypeEnum.SELL_CONTRACT) && selectedContract.id">
-        <div class='form-group'>
-          <md-field v-if='!useCustomTXO'>
-            <label>Sender Address:</label>
-            <md-input required v-model='fromAddress'></md-input>
-            <span class="md-helper-text pointer" v-on:click='copyWalletAddress()'>(Use wallet address)</span>
-          </md-field>
-          <div style='display:flex; justify-content: space-between'>
-          <md-field style='width: 60%'>
-            <label>Token For Sale:</label>
-            <md-select disabled :value="txnType === txnTypeEnum.SELL_CONTRACT ? selectedContract.propsIdForSale : selectedContract.propsIdDesired">
-              <md-option :value="selectedContract.propsIdForSale">{{ selectedContract ? selectedContract.propsNameForSale : '' }} </md-option>
-              <md-option :value="selectedContract.propsIdDesired">{{ selectedContract ? selectedContract.propsNameDesired: '' }} </md-option>
-            </md-select>
-          </md-field>
-          <md-field style='width:30%'>
-            <label>Quantity:</label>
-            <md-input disabled type='number' :value="txnType === txnTypeEnum.SELL_CONTRACT ? amount1 : amount2"></md-input>
-          </md-field>
-          </div>
-          <div style='display:flex; justify-content: space-between'>
-          <md-field style='width: 60%'>
-            <label>Token Desired:</label>
-            <md-select disabled :value="txnType === txnTypeEnum.SELL_CONTRACT ? selectedContract.propsIdDesired : selectedContract.propsIdForSale">
-              <md-option :value="selectedContract.propsIdForSale">{{ selectedContract ? selectedContract.propsNameForSale : '' }} </md-option>
-              <md-option :value="selectedContract.propsIdDesired">{{ selectedContract ? selectedContract.propsNameDesired: '' }} </md-option>
-            </md-select>
-          </md-field>
-          <md-field style='width:30%'>
-            <label>Quantity:</label>
-            <md-input disabled type='number' :value="txnType === txnTypeEnum.SELL_CONTRACT ? amount2 : amount1"></md-input>
-          </md-field>
-          </div>
-        </div>
-      </div> -->
-
-    <!-- <div class='divider' />
-
-      <div>
-
-          <md-button
-            v-if="(txnType === txnTypeEnum.BUY_CONTRACT || txnType === txnTypeEnum.SELL_CONTRACT || txnType === txnTypeEnum.LTC_INSTANT_TRADE) && selectedContract.id"
-            md-button 
-            class='md-accent md-raised' 
-            v-on:click="handleBuildRawTx()" 
-            :disabled='isDisabled()'
-          > 
-            SEND
-          </md-button>
-          <md-button
-            v-if="txnType === txnTypeEnum.CUSTOM_PAYLOAD || txnType === txnTypeEnum.SIMPLE_SEND"
-            md-button 
-            class='md-accent md-raised' 
-            v-on:click="handleBuildRawTx()" 
-            :disabled='isDisabled()'
-          > 
-            Build Raw 
-          </md-button>
-          <md-button 
-            v-if="txnType === txnTypeEnum.CUSTOM_PAYLOAD || txnType === txnTypeEnum.SIMPLE_SEND"
-            md-button 
-            class='md-primary md-raised'
-            v-on:click="!signedRawTx ? handleSignRawTx(unSignedRawTx) : handleSendRawTx(signedRawTx)" 
-            :disabled="!signedRawTx ? !unSignedRawTx : !signedRawTx" 
-          >
-            {{ !signedRawTx ? 'SIGN' : 'SEND' }}
-          </md-button>
-          <textarea 
-          v-if="selectedContract.id"
-          class='nice-textarea' 
-          type='text-area'
-          :value='buildRawTxMessage'
-          readonly />  
-      </div> -->
+      </div>
+    </div>
+    <div class='divider' />
+    <div class="buttons">
+      <md-button
+        md-button 
+        class='md-accent md-raised' 
+        v-on:click="handleBuildRawTx()" 
+      > 
+        Build TX
+      </md-button>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapState, mapActions } from "vuex";
-import { walletService } from "../services";
 import { txnType } from "../store/txns.module"
 
 export default {
   name: "Wallet",
   data: () => ({
     txnType,
+    senderAddress: null,
+    amountDesired: 0,
+    amountForSale: 0,
+    tokenDesired: '',
+    tokenForSale: '',
   }),
   computed: {
     ...mapState("wallet", ["walletDec", "currentAddressIndex"]),
     ...mapGetters("wallet", ["currentAddressLTCBalance"]),
-    ...mapGetters("txns", ["getSelectedTxnType"]),
+    ...mapGetters("txns", [
+      "getSelectedTxnType", 
+      "getTokenForSale", 
+      'getTokenDesired', 
+      'getAmountForSale', 
+      'getAmountDesired',
+      ]),
+    ...mapGetters("markets", ["getMarketsTypes", "getSelectedMarket"]),
     selectedTxnType: {
       get() {
         return this.getSelectedTxnType;
@@ -222,15 +103,49 @@ export default {
       set(value) {
         this.setSelectedTxnType(value);
       }
+    },
+    LTCmarkets() {
+        return this.getMarketsTypes.find(m => m.name === 'LTC')
+            .markets.map(m => m.a);
     }
+  },
+  watch: {
+    getAmountForSale(v) {
+      this.amountForSale = v;
+    },
+    getAmountDesired(v) {
+      this.amountDesired = v
+    },
+    getTokenDesired(v) {
+      this.tokenDesired = v
+    },
+    getTokenForSale(v) {
+      this.tokenForSale = v
+    },
   },
   methods: {
     ...mapActions("wallet", ["setCurrentAddress"]),
+    ...mapActions("txns", ["buildRawTx"]),
     ...mapMutations("txns", ["setSelectedTxnType"]),
     updateCurrentUTXOs() {
-      console.log('updateCurrentUTXOs')
+      console.log('updateCurrentUTXOs');
+    },
+    copyWalletAddress() {
+      this.senderAddress = this.walletDec[this.currentAddressIndex].publicAddress
+    },
+    handleBuildRawTx() {
+      console.log('Build Raw Tx');
+      const options = {
+        address: this.senderAddress,
+        amountDesired: this.amountDesired,
+        amountForSale: this.amountForSale,
+        tokenDesired: this.tokenDesired.id,
+        tokenForSale: this.tokenForSale.id,
+        type: this.getSelectedTxnType,
+      };
+      this.buildRawTx(options)
     }
-  }
+  },
 };
 </script>
 

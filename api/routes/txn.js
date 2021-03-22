@@ -189,6 +189,17 @@ txnRouter.get('/callAsyncRPC', (req, res) => {
     tl[command](...JSON.parse(args))
         .then(result => res.send(result));
 });
+
+txnRouter.get('/ltcInstantTrade', (req, res) => {
+    console.log(req.query);
+    res.send({ data: 'Data' });
+});
+
+txnRouter.get('/tokenTokenTrade', (req, res) => {
+    console.log(req.query)
+    res.send({ data: 'Data' });
+});
+
 // --> commented out models
 // const getUTXOsForManyTxns = async (txnDataArray, omniClient, next)=>{
 //     let allUTXOs = []
