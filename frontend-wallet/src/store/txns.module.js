@@ -32,7 +32,10 @@ const actions = {
                 price: amountForSale,
                 address,
             })
-            console.log(result);
+            const { error, data } = result;
+            if (error || !data) return commit('alert/error', error || 'There is an error with the trade', { root: true });
+            console.log(data)
+            commit('alert/success', data, { root: true });
         }
 
         if (type === txnType.TOKEN_TOKEN) {
@@ -43,7 +46,10 @@ const actions = {
                 tokenForSale,
                 address,
             });
-            console.log(result);
+            const { error, data } = result;
+            if (error || !data) return commit('alert/error', error || 'There is an error with the trade', { root: true });
+            console.log(data)
+            commit('alert/success', data, { root: true });
         }
     },
     initTrade({ dispatch, commit, rootState }, options) {

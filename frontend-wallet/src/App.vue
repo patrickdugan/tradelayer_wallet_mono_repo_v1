@@ -24,6 +24,7 @@ import Toolbar from "@/components/Toolbar"
 import Wallet from "@/components/Wallet";
 import Navigation from "@/components/Navigation"
 import SubMenu from '@/components/SubMenu';
+import { mapGetters, mapMutations, mapState } from "vuex";
 
 export default {
   name: "App",
@@ -37,13 +38,27 @@ export default {
     showNavigation: false,
     showWallet: false
   }),
+  computed: {
+    ...mapGetters('alert', ['getAlert']),
+  },
   mounted() {
     window.toggleWallet = this.toggleWallet;
   },
+    watch: {
+    getAlert: function(n){
+      console.log({n})
+      if (!n.type) return;
+      this.$toast[n.type](n.message);
+      this.clear()
+    },
+  },
   methods: {
+        ...mapMutations('alert', ['clear']),
+
     toggleWallet() {
       this.showWallet = !this.showWallet;
     },
+
   }
 };
 </script>

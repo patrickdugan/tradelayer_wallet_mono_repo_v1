@@ -19,7 +19,7 @@ const findNewBlocks = () => {
 
             if(getInfo && blocksInfo) {
                 const blocksInfoArr = JSON.parse(blocksInfo);
-                console.log(getInfo)
+                // console.log(getInfo)
                 const { block } = JSON.parse(getInfo);
                 const oldBlocks = block;
 
