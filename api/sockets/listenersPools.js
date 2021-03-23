@@ -29,8 +29,6 @@ function initPool(PORT) {
               }
 
         })
-
-        setTimeout(() => console.log(poolListeners),1000)
     })
 
 };

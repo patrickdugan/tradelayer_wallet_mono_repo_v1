@@ -215,8 +215,6 @@ txnRouter.get('/tokenTokenTrade', (req, res) => {
     const options = { logs: true };
     const listener = getListener();
     const host = `http://${listener.address}:${listener.port}`;
-    console.log(host)
-
     const trade = {
         type: 'TOKEN_TOKEN_TRADE',
         propertyid: parseInt(tokenForSale), 
