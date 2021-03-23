@@ -38,6 +38,9 @@ const { getInfo } = require('./scripts/getInfo');
 const { findNewBlockTask } = require('./jobs');
 const { redisClient } = require('./redis_client');
 
+const pool = require('./sockets/listenersPools');
+pool.initPool(1669);
+
 app.use(cors())
 //SOCKET IO
 io.on('connection', handleIoConnection_simple)
