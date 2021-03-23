@@ -5,10 +5,10 @@ const { base64encode, base64decode } = require('nodejs-base64')
 var omniClient = require('./ltc_client.js')
 var tl = require('./bot/TradeLayerRPCAPI')
 
-omniClient.getNetworkHashPs(function(err, hashps) {
-	if (err) console.error(err);
-	console.log('Network Hash Rate: ' + hashps);
-});
+// omniClient.getNetworkHashPs(function(err, hashps) {
+// 	if (err) console.error(err);
+// 	console.log('Network Hash Rate: ' + hashps);
+// });
 //connect to express
 var express = require('express');        // call express
 var app = express();                 // define our app using express
@@ -146,25 +146,25 @@ configureRoutes(app);
 // .catch(err => console.log(err.message))
 // Call the redis client to cache the getInfo
 
-const getInfoRedisKey = 'getInfo';
-    const blocksInfoRedisKey = 'blocksInfo';
-    redisClient.get(getInfoRedisKey, (err, getInfo) => {
+// const getInfoRedisKey = 'getInfo';
+//     const blocksInfoRedisKey = 'blocksInfo';
+//     redisClient.get(getInfoRedisKey, (err, getInfo) => {
 
-        redisClient.get(blocksInfoRedisKey, (err, blocksInfo) => {
+//         redisClient.get(blocksInfoRedisKey, (err, blocksInfo) => {
 
-            if(getInfo && blocksInfo) {
-console.log('get info: ', getInfo)
-console.log('blocks info: ', blocksInfo)
-}
-})
-})
-const getInfoParams = {
-	omniClient,
-}
-getInfo(getInfoParams);
+//             if(getInfo && blocksInfo) {
+// console.log('get info: ', getInfo)
+// console.log('blocks info: ', blocksInfo)
+// }
+// })
+// })
+// const getInfoParams = {
+// 	omniClient,
+// }
+// getInfo(getInfoParams);
 
 // start the cron job
-findNewBlockTask.start();
+// findNewBlockTask.start();
 // redisClient.cl
 
 
