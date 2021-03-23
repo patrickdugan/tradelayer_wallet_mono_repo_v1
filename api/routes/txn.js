@@ -6,6 +6,8 @@ const tl = require('../bot/TL-RPC-API-ASYNC');
 
 const TokenTokenTrade = require('../bot/tl-socket-script').TokenTokenTrade;
 const LtcInstantTrade = require('../bot/tl-socket-script').LtcInstantTrade;
+const getListener = require('../sockets/listenersPools').getListener;
+
 txnRouter.post('/', (req,res)=>{
     const {rawTxn} = req.body
     req.omniClient.cmd('sendrawtransaction', rawTxn, (err, data)=>{
@@ -194,7 +196,8 @@ txnRouter.get('/callAsyncRPC', (req, res) => {
 
 txnRouter.get('/ltcInstantTrade', (req, res) => {
     const options = { logs: true };
-    const host = `http://localhost:9876`;
+    const listener = getListener()
+    const host = `${listener.address}:${listener.port}`;
     const { amountDesired, tokenDesired, price, address } = req.query;
     const trade = {
         type: 'LTC_INSTANT_TRADE',
@@ -210,7 +213,10 @@ txnRouter.get('/ltcInstantTrade', (req, res) => {
 txnRouter.get('/tokenTokenTrade', (req, res) => {
     const { amountDesired, tokenDesired, amountForSale, tokenForSale, address } = req.query;
     const options = { logs: true };
-    const host = `http://localhost:9876`;
+    const listener = getListener();
+    const host = `http://${listener.address}:${listener.port}`;
+    console.log(host)
+
     const trade = {
         type: 'TOKEN_TOKEN_TRADE',
         propertyid: parseInt(tokenForSale), 
