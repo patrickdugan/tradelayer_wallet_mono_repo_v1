@@ -50,6 +50,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LtcInstantTrade = void 0;
 var receiver_1 = require("./receiver");
@@ -87,8 +92,10 @@ var LtcInstantTrade = /** @class */ (function (_super) {
                         return [4 /*yield*/, this.listUnspent(this.trade.address)];
                     case 2:
                         rus = _b.sent();
+                        console.log("multy length (" + this.multySigChannelData.address + "): " + msus.length);
+                        console.log("recivier length (" + this.trade.address + "): " + rus.length);
                         if (!(msus === null || msus === void 0 ? void 0 : msus.length) || !(rus === null || rus === void 0 ? void 0 : rus.length))
-                            return [2 /*return*/];
+                            return [2 /*return*/, this.terminateTrade("Undefined Problem")];
                         return [4 /*yield*/, this._buildLTCInstantTrade(msus, rus)];
                     case 3:
                         bltcitData = _b.sent();
@@ -99,32 +106,39 @@ var LtcInstantTrade = /** @class */ (function (_super) {
         });
     };
     LtcInstantTrade.prototype._buildLTCInstantTrade = function (msus, rus) {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var bbData, trade, propertyid, amount, price, address, cpitLTCOptions, cpitRes, vins, bttt;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var bbData, trade, propertyid, amount, price, address, cpitLTCOptions, cpitRes, vins, gtRes, refAddress, bLTCit;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         this.log("Building LTC Instant Trade");
                         return [4 /*yield*/, this.getBestBlock(10)];
                     case 1:
-                        bbData = _a.sent();
+                        bbData = _c.sent();
                         trade = this.trade;
                         propertyid = trade.propertyid, amount = trade.amount, price = trade.price, address = trade.address;
                         cpitLTCOptions = [propertyid, amount, price, bbData];
                         return [4 /*yield*/, tl_api_1.api.createPayload_instantTrade_LTC.apply(tl_api_1.api, cpitLTCOptions)];
                     case 2:
-                        cpitRes = _a.sent();
+                        cpitRes = _c.sent();
                         if (cpitRes.error || !cpitRes.data)
                             return [2 /*return*/, this.terminateTrade(cpitRes.error)];
                         this.log("Created Instat Trade payload: " + cpitRes.data);
-                        vins = msus.map(function (us) { return ({ txid: us.txid, vout: us.vout }); });
-                        return [4 /*yield*/, tl_api_1.api.buildTokenTokenTrade(vins, cpitRes.data, address)];
+                        vins = __spreadArray(__spreadArray([], msus.map(function (us) { return ({ txid: us.txid, vout: us.vout }); })), [{ txid: rus[0].txid, vout: rus[0].vout }]);
+                        return [4 /*yield*/, tl_api_1.api.tl_gettransaction(msus[0].txid)];
                     case 3:
-                        bttt = _a.sent();
-                        if (bttt.error || !bttt.data)
-                            return [2 /*return*/, this.terminateTrade(cpitRes.error || 'Error with Creating the Payload')];
-                        this.log("Created RawTx: " + bttt.data);
-                        return [2 /*return*/, bttt.data];
+                        gtRes = _c.sent();
+                        if (gtRes.error || !((_a = gtRes.data) === null || _a === void 0 ? void 0 : _a.sendingaddress))
+                            return [2 /*return*/, this.terminateTrade(cpitRes.error)];
+                        refAddress = gtRes.data.sendingaddress;
+                        return [4 /*yield*/, tl_api_1.api.buildLTCInstantTrade(vins, cpitRes.data, refAddress, price, address)];
+                    case 4:
+                        bLTCit = _c.sent();
+                        if (bLTCit.error || !((_b = bLTCit.data) === null || _b === void 0 ? void 0 : _b.hex))
+                            return [2 /*return*/, this.terminateTrade(cpitRes.error || 'Error with Building LTC Instant Trade')];
+                        this.log("Created RawTx: " + bLTCit.data.hex);
+                        return [2 /*return*/, bLTCit.data.hex];
                 }
             });
         });

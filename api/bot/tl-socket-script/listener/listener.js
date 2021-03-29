@@ -42,13 +42,25 @@ var socket_io_1 = require("socket.io");
 var events_1 = require("../common/enums/events");
 var tradeTypes_1 = require("../common/enums/tradeTypes");
 var tl_api_1 = require("../common/tl-api");
+var socket_io_client_1 = require("socket.io-client");
 var ListenerServer = /** @class */ (function () {
     function ListenerServer(address, port, options) {
+        this.port = port;
         this.init(port);
         this.serverOptions = { address: address, options: options };
     }
     ListenerServer.prototype.close = function () {
         this.io.close();
+    };
+    ListenerServer.prototype.joinPool = function (pool) {
+        var _this = this;
+        var poolClient = socket_io_client_1.io(pool, { reconnection: false });
+        poolClient.on('connect', function () {
+            console.log("Connected to pool: " + pool);
+            poolClient.on('test', function (test) {
+                poolClient.emit('testResult', { port: _this.port });
+            });
+        });
     };
     ListenerServer.prototype.init = function (port) {
         console.log("Start Listener Server on port " + port);
@@ -193,6 +205,8 @@ var Listener = /** @class */ (function () {
                         return [4 /*yield*/, tl_api_1.api.commitToChannel.apply(tl_api_1.api, commitData)];
                     case 1:
                         ctcRes = _a.sent();
+                        console.log(commitData);
+                        console.log(ctcRes);
                         if (ctcRes.error || !ctcRes.data)
                             return [2 /*return*/, this.terminateTrade(ctcRes.error)];
                         this.listenerCommitTx = ctcRes.data;

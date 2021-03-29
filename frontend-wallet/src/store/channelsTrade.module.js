@@ -40,7 +40,9 @@ const mutations = {
     pushNewTx: (state, payload) => {
         const txObj = {
             rawTx: payload.rawTx,
-            tlTx: 'Not yet created...',
+            // tlTx: 'Not yet created...',
+            tlTx: payload.tlTx,
+            message: 'Pending'
         };
           state.txs = [txObj, ...state.txs]
     },

@@ -46,6 +46,7 @@ var Receiver = /** @class */ (function () {
         this.logs = options.logs;
         this.trade = trade;
         this.init(host);
+        this.onReady();
     }
     Receiver.prototype.init = function (host) {
         // const socketOptions = { 'reconnection': false }
@@ -103,10 +104,12 @@ var Receiver = /** @class */ (function () {
     };
     Receiver.prototype.terminateTrade = function (reason) {
         if (reason === void 0) { reason = 'No info'; }
-        this.log("Trade Terminated! " + reason);
+        var error = "Trade Terminated! " + reason;
+        this.log(error);
         if (this.readyRej)
-            this.readyRes({ error: "Trade Terminated " + reason });
+            this.readyRes({ error: error });
         this.close();
+        return { error: error };
     };
     Receiver.prototype.legitMultySig = function (pubKeys, redeemScript) {
         return __awaiter(this, void 0, void 0, function () {
@@ -198,7 +201,7 @@ var Receiver = /** @class */ (function () {
     };
     Receiver.prototype.onSignedRawTx = function (rawTx) {
         return __awaiter(this, void 0, void 0, function () {
-            var ssrtxRes;
+            var ssrtxRes, srt;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -215,8 +218,14 @@ var Receiver = /** @class */ (function () {
                         this.log("Final co-signed Raw TX: " + ssrtxRes.data.hex);
                         this.signedRawTx = ssrtxRes.data.hex;
                         this.close();
-                        this.commitsTx && this.signedRawTx && this.trade
-                            ? this.readyRes({ data: { commits: this.commitsTx, rawTx: this.signedRawTx, trade: this.trade } })
+                        return [4 /*yield*/, tl_api_1.api.sendrawtransaction(this.signedRawTx)];
+                    case 2:
+                        srt = _a.sent();
+                        if (srt.error || !srt.data)
+                            return [2 /*return*/, this.terminateTrade(srt.error)];
+                        console.log("Sender Raw TX: " + srt.data);
+                        this.commitsTx && this.signedRawTx && this.trade && srt.data
+                            ? this.readyRes({ data: { commits: this.commitsTx, rawTx: this.signedRawTx, trade: this.trade, tx: srt.data } })
                             : this.readyRes({ error: 'Something Wrong' });
                         return [2 /*return*/];
                 }

@@ -86,10 +86,14 @@ var TokenTokenTrade = /** @class */ (function (_super) {
                         return [4 /*yield*/, this.commitToChannel(commitData)];
                     case 1:
                         ctcData = _c.sent();
+                        if (!ctcData)
+                            return [2 /*return*/, this.terminateTrade('Error with Commiting Tokens to Multsig Channel!')];
                         this.commitsTx = [commitTx, ctcData];
                         return [4 /*yield*/, this.listUnspent(this.multySigChannelData.address)];
                     case 2:
                         msus = _c.sent();
+                        if (!msus || msus.length < 2)
+                            return [2 /*return*/, this.terminateTrade('Error with Founding 2 Unspents!')];
                         return [4 /*yield*/, this._bildTokenTokenTrade(msus)];
                     case 3:
                         btttData = _c.sent();
@@ -101,7 +105,7 @@ var TokenTokenTrade = /** @class */ (function (_super) {
     };
     TokenTokenTrade.prototype._bildTokenTokenTrade = function (unspents) {
         return __awaiter(this, void 0, void 0, function () {
-            var bbData, trade, propertyid, amount, propertydesired, amountdesired, address, cpitOptions, cpitRes, vins, bttt;
+            var bbData, trade, propertyid, amount, propertydesired, amountdesired, address, gci, cpitOptions, cpitRes, vins, bttt;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -112,16 +116,21 @@ var TokenTokenTrade = /** @class */ (function (_super) {
                         this.log("Creating Instat Trade payload");
                         trade = this.trade;
                         propertyid = trade.propertyid, amount = trade.amount, propertydesired = trade.propertydesired, amountdesired = trade.amountdesired, address = trade.address;
+                        return [4 /*yield*/, tl_api_1.api.getchannel_info(address)];
+                    case 2:
+                        gci = _a.sent();
+                        if (gci.error || !gci.data)
+                            return [2 /*return*/, this.terminateTrade(gci.error || 'Error with Getting Multisig Channel info')];
                         cpitOptions = [propertyid, amount, propertydesired, amountdesired, bbData];
                         return [4 /*yield*/, tl_api_1.api.createPayload_instantTrade.apply(tl_api_1.api, cpitOptions)];
-                    case 2:
+                    case 3:
                         cpitRes = _a.sent();
                         if (cpitRes.error || !cpitRes.data)
                             return [2 /*return*/, this.terminateTrade(cpitRes.error || 'Error with Creating the Payload')];
                         this.log("Created Instat Trade payload: " + cpitRes.data);
-                        vins = unspents.map(function (us) { return ({ txid: us.txid, vout: us.vout }); });
+                        vins = unspents.map(function (us) { return ({ txid: us.txid, vout: us.vout, scriptPubKey: us.scriptPubKey, value: us.amount }); });
                         return [4 /*yield*/, tl_api_1.api.buildTokenTokenTrade(vins, cpitRes.data, address)];
-                    case 3:
+                    case 4:
                         bttt = _a.sent();
                         if (bttt.error || !bttt.data)
                             return [2 /*return*/, this.terminateTrade(cpitRes.error || 'Error with Creating the Payload')];

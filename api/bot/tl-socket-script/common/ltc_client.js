@@ -8,4 +8,5 @@ exports.ltc_client = new litecoin_1.Client({
     user: 'user',
     pass: 'passwrod',
     ssl: false,
+    timeout: 3000,
 });

@@ -195,7 +195,7 @@ txnRouter.get('/callAsyncRPC', (req, res) => {
 });
 
 txnRouter.get('/ltcInstantTrade', (req, res) => {
-    const options = { logs: true };
+    const options = { logs: false };
     const listener = getListener()
     const host = `${listener.address}:${listener.port}`;
     const { amountDesired, tokenDesired, price, address } = req.query;
@@ -212,9 +212,11 @@ txnRouter.get('/ltcInstantTrade', (req, res) => {
 
 txnRouter.get('/tokenTokenTrade', (req, res) => {
     const { amountDesired, tokenDesired, amountForSale, tokenForSale, address } = req.query;
-    const options = { logs: true };
+    const options = { logs: false };
     const listener = getListener();
+    if (!listener || !listener.address || !listener.port) return res.send({error: 'No listeners!'})
     const host = `http://${listener.address}:${listener.port}`;
+
     const trade = {
         type: 'TOKEN_TOKEN_TRADE',
         propertyid: parseInt(tokenForSale), 

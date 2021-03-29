@@ -33,9 +33,9 @@ const actions = {
                 address,
             })
             const { error, data } = result;
-            if (error || !data) return commit('alert/error', error || 'There is an error with the trade', { root: true });
-            console.log(data)
-            commit('alert/success', data, { root: true });
+            if (error || !data || !data.tx) return commit('alert/error', error || 'There is an error with the trade', { root: true });
+            commit('alert/success', `Created TX ${data.tx}`, { root: true });
+            commit('channelsTrade/pushNewTx', { tlTx: data.tx, rawTx: data.rawTx }, { root: true });
         }
 
         if (type === txnType.TOKEN_TOKEN) {
@@ -47,9 +47,9 @@ const actions = {
                 address,
             });
             const { error, data } = result;
-            if (error || !data) return commit('alert/error', error || 'There is an error with the trade', { root: true });
-            console.log(data)
-            commit('alert/success', data, { root: true });
+            if (error || !data || !data.tx) return commit('alert/error', error || 'There is an error with the trade', { root: true });
+            commit('alert/success', `Created TX ${data.tx}`, { root: true });
+            commit('channelsTrade/pushNewTx', { tlTx: data.tx, rawTx: data.rawTx }, { root: true });
         }
     },
     initTrade({ dispatch, commit, rootState }, options) {
