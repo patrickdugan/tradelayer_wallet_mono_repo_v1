@@ -41,8 +41,9 @@ var socket_io_client_1 = require("socket.io-client");
 var events_1 = require("../common/enums/events");
 var tl_api_1 = require("../common/tl-api");
 var Receiver = /** @class */ (function () {
-    function Receiver(host, trade, options) {
+    function Receiver(host, trade, options, send) {
         this.logs = false;
+        this.send = send;
         this.logs = options.logs;
         this.trade = trade;
         this.init(host);
@@ -218,16 +219,22 @@ var Receiver = /** @class */ (function () {
                         this.log("Final co-signed Raw TX: " + ssrtxRes.data.hex);
                         this.signedRawTx = ssrtxRes.data.hex;
                         this.close();
+                        if (!this.commitsTx || !this.signedRawTx || !this.trade) {
+                            return [2 /*return*/, this.readyRes({ error: 'Something Wrong' })];
+                        }
+                        if (!this.send) return [3 /*break*/, 3];
                         return [4 /*yield*/, tl_api_1.api.sendrawtransaction(this.signedRawTx)];
                     case 2:
                         srt = _a.sent();
                         if (srt.error || !srt.data)
                             return [2 /*return*/, this.terminateTrade(srt.error)];
                         console.log("Sender Raw TX: " + srt.data);
-                        this.commitsTx && this.signedRawTx && this.trade && srt.data
-                            ? this.readyRes({ data: { commits: this.commitsTx, rawTx: this.signedRawTx, trade: this.trade, tx: srt.data } })
-                            : this.readyRes({ error: 'Something Wrong' });
-                        return [2 /*return*/];
+                        this.readyRes({ commits: this.commitsTx, rawTx: this.signedRawTx, trade: this.trade, tx: srt.data });
+                        return [3 /*break*/, 4];
+                    case 3:
+                        this.readyRes({ commits: this.commitsTx, rawTx: this.signedRawTx, trade: this.trade });
+                        _a.label = 4;
+                    case 4: return [2 /*return*/];
                 }
             });
         });

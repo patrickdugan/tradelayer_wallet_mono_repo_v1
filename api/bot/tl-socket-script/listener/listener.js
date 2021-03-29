@@ -205,8 +205,6 @@ var Listener = /** @class */ (function () {
                         return [4 /*yield*/, tl_api_1.api.commitToChannel.apply(tl_api_1.api, commitData)];
                     case 1:
                         ctcRes = _a.sent();
-                        console.log(commitData);
-                        console.log(ctcRes);
                         if (ctcRes.error || !ctcRes.data)
                             return [2 /*return*/, this.terminateTrade(ctcRes.error)];
                         this.listenerCommitTx = ctcRes.data;

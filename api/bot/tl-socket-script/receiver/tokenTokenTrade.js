@@ -57,8 +57,8 @@ var events_1 = require("../common/enums/events");
 var tl_api_1 = require("../common/tl-api");
 var TokenTokenTrade = /** @class */ (function (_super) {
     __extends(TokenTokenTrade, _super);
-    function TokenTokenTrade(host, trade, options) {
-        return _super.call(this, host, trade, options) || this;
+    function TokenTokenTrade(host, trade, options, send) {
+        return _super.call(this, host, trade, options, send) || this;
     }
     TokenTokenTrade.prototype.initTrade = function () {
         this.log("Init Token/Token Trade !");

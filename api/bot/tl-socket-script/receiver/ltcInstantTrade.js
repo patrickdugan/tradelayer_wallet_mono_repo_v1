@@ -62,8 +62,8 @@ var events_1 = require("../common/enums/events");
 var tl_api_1 = require("../common/tl-api");
 var LtcInstantTrade = /** @class */ (function (_super) {
     __extends(LtcInstantTrade, _super);
-    function LtcInstantTrade(host, trade, options) {
-        return _super.call(this, host, trade, options) || this;
+    function LtcInstantTrade(host, trade, options, send) {
+        return _super.call(this, host, trade, options, send) || this;
     }
     LtcInstantTrade.prototype.initTrade = function () {
         this.log("Init LTC Instant Trade !");
