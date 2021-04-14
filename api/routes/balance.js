@@ -5,6 +5,8 @@ var datadir = config.TLDATADIR
 var exec = require('child_process').exec;
 const express = require('express')
 const balanceRouter = express.Router()
+const axios = require('axios')
+
 //const {Address, Balance} = require('../models/index.js') 
 
 balanceRouter.get('/address/:address', (req, res)=>{
@@ -169,6 +171,26 @@ balanceRouter.get('/getBalanceALL', function(req, res){
           console.log('balance command error', stderr)
       } //end balance command execution
   });
+})
+
+balanceRouter.get('/getAvailableBalance', async (req, res) => {
+  const addresses = req.query.addresses;
+  if (!addresses || !addresses.length) res({error: `No provided Addresses`});
+  const network = 'LTCTEST';
+  const url = `https://sochain.com/api/v2/get_address_balance/${network}`;
+
+  const promisesArray = addresses.map(async address => axios.get(`${url}/${address}`));
+  const promisesResult = await Promise.all(promisesArray);
+  const result = promisesResult.map(_r => _r.data.data);
+  const sumConfirmed = result.map(_ => parseFloat(_.confirmed_balance)).reduce((acc, val) => acc + val, 0);
+  const sumUnconfirmed = result.map(_ => parseFloat(_.unconfirmed_balance)).reduce((acc, val) => acc + val, 0);
+  const sum = {
+    address: 'sum',
+    confirmed_balance: sumConfirmed,
+    unconfirmed_balance: sumUnconfirmed,
+  }
+  result.push(sum);
+  res.send(result);
 })
 
 balanceRouter.get('/getEquity', function(req, res){

@@ -30,6 +30,7 @@ const state = {
   // lastTlTx: '',
   // lastTxStatus: '',
   // selectedToken: 0,
+  ltcAvailable: 0,
 }
 
 // reusable helpers
@@ -70,6 +71,13 @@ const addKeyPairToState = (state, keyPair, password) => {
 }
 
 const actions = {
+  async getAvailableBalance({ commit, state }) {
+    const addresses = state.walletDec.map(a => a.publicAddress);
+    const balance = await walletService.getAvailableBalance(addresses);
+    console.log({balance})
+    const totalAvailable = balance.find(b => b.address === "sum").confirmed_balance;
+    commit('setLtcAvailable', totalAvailable);
+  },
   // async createCustomRawTx({ commit, state }, txBuildOptions){
   //   const buildRawTxResult = await walletService.buildRawTx(txBuildOptions);
   //   const { data, error } = buildRawTxResult;
@@ -191,6 +199,10 @@ const mutations = {
   //   state.buildRawTxMessage = message
   // },
 
+  setLtcAvailable(state, amount) {
+    state.ltcAvailable = amount
+  },
+
   addKeyPair(state, { password, next, error }) {
     if (decryptWalletExtracted(state, password)) {
       const keyPair = generateKeyPair()
@@ -310,6 +322,10 @@ const getters = {
   //   console.log(state.buildRawTxMessage)
   //   return state.buildRawTxMessage;
   // },
+  getLtcAvailable(state) {
+    return state.ltcAvailable;
+  },
+
   walletCountDisplay(state) {
     const count = state.walletDec.length
     switch (count) {

@@ -24,7 +24,7 @@ import Toolbar from "@/components/Toolbar"
 import Wallet from "@/components/Wallet";
 import Navigation from "@/components/Navigation"
 import SubMenu from '@/components/SubMenu';
-import { mapGetters, mapMutations, mapState } from "vuex";
+import { mapGetters, mapMutations, mapState, mapActions } from "vuex";
 
 export default {
   name: "App",
@@ -43,6 +43,7 @@ export default {
   },
   mounted() {
     window.toggleWallet = this.toggleWallet;
+    this.getAvailableBalance();
   },
     watch: {
     getAlert: function(n){
@@ -54,7 +55,7 @@ export default {
   },
   methods: {
         ...mapMutations('alert', ['clear']),
-
+        ...mapActions('wallet', ['getAvailableBalance']),
     toggleWallet() {
       this.showWallet = !this.showWallet;
     },

@@ -42,20 +42,20 @@
 
       <div class="md-toolbar-section-end" style='margin: 0 1rem'>
         <div class="md-layout md-gutter md-alignment-center-space-between">
-          <!-- <div class="md-layout-item" v-show="isLoggedIn">
+          <div class="md-layout-item" v-show="isLoggedIn">
             <div class="md-list-item-text">
               <span>Equity</span>
-              <span>{{this.equityGetter}}</span>
+              <span>{{this.equityGetter}} </span>
               <md-tooltip md-direction="bottom">Balance + Reserved + PNL</md-tooltip>
             </div>
           </div>
           <div class="md-layout-item" v-show="isLoggedIn">
             <div class="md-list-item-text">
               <span>Available</span>
-              <span>{{this.equityGetter}}</span>
+              <span>{{ this.getLtcAvailable }} LTC</span>
               <md-tooltip md-direction="bottom">Equity - Initial Margin</md-tooltip>
             </div>
-          </div> -->
+          </div>
           <div v-show="!isLoggedIn" class="md-layout-item">
             <router-link to="/Recover">
               <md-tooltip md-direction="bottom">Login</md-tooltip>
@@ -110,7 +110,8 @@ export default {
         "walletCountDisplay",
         "isLoggedIn",
         "publicAddresses",
-        "walletEnc"
+        "walletEnc",
+        "getLtcAvailable"
         ]),
         ...mapGetters("contracts", ["equityGetter"])
     },

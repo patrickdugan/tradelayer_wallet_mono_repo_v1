@@ -133,6 +133,12 @@ const validateAddress = async (address) => {
   return validateAddressResult.data
 }
 
+const getAvailableBalance = async (addresses) => {
+  const params = { addresses }
+  const res = await axiosInstance.get('/balances/getAvailableBalance', { params });
+  return res.data;
+}
+
 export const walletService = {
   getUTXOs,
   getUTXOs2,
@@ -147,4 +153,5 @@ export const walletService = {
   sendRawTx,
   createSimpleSendPayload,
   validateAddress,
+  getAvailableBalance,
 };
