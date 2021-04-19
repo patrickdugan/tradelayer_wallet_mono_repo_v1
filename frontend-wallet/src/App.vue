@@ -43,7 +43,7 @@ export default {
   },
   mounted() {
     window.toggleWallet = this.toggleWallet;
-    this.getAvailableBalance();
+    this.availableBalanceAction();
   },
     watch: {
     getAlert: function(n){
@@ -55,7 +55,7 @@ export default {
   },
   methods: {
         ...mapMutations('alert', ['clear']),
-        ...mapActions('wallet', ['getAvailableBalance']),
+        ...mapActions('wallet', ['availableBalanceAction']),
     toggleWallet() {
       this.showWallet = !this.showWallet;
     },

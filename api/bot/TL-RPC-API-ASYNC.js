@@ -79,7 +79,11 @@ api.createPayload_instantTrade_LTC = async (id, amount, ltc, expiryBlockHeight) 
 api.commitToChannel = async (sendingAddress, channelAddress, propertyid, amount) =>
     await asyncClient("tl_commit_tochannel",sendingAddress, channelAddress, propertyid, amount);
 
+api.getallbalancesforaddress = async (address) =>
+    await asyncClient('tl_getallbalancesforaddress', address);
 
+api.getLtcvolume = async (tokenId) =>
+    await asyncClient('tl_get_ltcvolume', tokenId, 1, 999999999)
 // Complex RPC APIs
 
 api.getBestBlock = async () => {

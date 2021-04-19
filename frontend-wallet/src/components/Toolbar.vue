@@ -45,14 +45,14 @@
           <div class="md-layout-item" v-show="isLoggedIn">
             <div class="md-list-item-text">
               <span>Equity</span>
-              <span>{{this.equityGetter}} </span>
+              <span> {{ this.getEquity.toFixed(6) }} LTC</span>
               <md-tooltip md-direction="bottom">Balance + Reserved + PNL</md-tooltip>
             </div>
           </div>
           <div class="md-layout-item" v-show="isLoggedIn">
             <div class="md-list-item-text">
               <span>Available</span>
-              <span>{{ this.getLtcAvailable }} LTC</span>
+              <span>{{ this.getLtcAvailable.toFixed(6) }} LTC</span>
               <md-tooltip md-direction="bottom">Equity - Initial Margin</md-tooltip>
             </div>
           </div>
@@ -111,7 +111,8 @@ export default {
         "isLoggedIn",
         "publicAddresses",
         "walletEnc",
-        "getLtcAvailable"
+        "getLtcAvailable",
+        "getEquity",
         ]),
         ...mapGetters("contracts", ["equityGetter"])
     },

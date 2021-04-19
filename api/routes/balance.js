@@ -6,6 +6,7 @@ var exec = require('child_process').exec;
 const express = require('express')
 const balanceRouter = express.Router()
 const axios = require('axios')
+const tl = require('../bot/TL-RPC-API-ASYNC');
 
 //const {Address, Balance} = require('../models/index.js') 
 
@@ -173,21 +174,50 @@ balanceRouter.get('/getBalanceALL', function(req, res){
   });
 })
 
-balanceRouter.get('/getAvailableBalance', async (req, res) => {
-  const addresses = req.query.addresses;
-  if (!addresses || !addresses.length) res({error: `No provided Addresses`});
+const getBalance = async (address) => {
   const network = 'LTCTEST';
-  const url = `https://sochain.com/api/v2/get_address_balance/${network}`;
+  const apiUrl = `https://sochain.com/api/v2/get_address_balance/${network}`;
+  const res = await axios.get(`${apiUrl}/${address}`);
+  return res.data.data
+};
 
-  const promisesArray = addresses.map(async address => axios.get(`${url}/${address}`));
-  const promisesResult = await Promise.all(promisesArray);
-  const result = promisesResult.map(_r => _r.data.data);
-  const sumConfirmed = result.map(_ => parseFloat(_.confirmed_balance)).reduce((acc, val) => acc + val, 0);
-  const sumUnconfirmed = result.map(_ => parseFloat(_.unconfirmed_balance)).reduce((acc, val) => acc + val, 0);
+const getTokens = async (address) => {
+  const equityRes = await tl.getallbalancesforaddress(address);
+  const proprArray = equityRes.data || [];
+
+  const equityArray = [];
+  for (let i=0; i < proprArray.length; i++) {
+    const propertyid = proprArray[i].propertyid;
+    const balance = parseFloat(proprArray[i].balance);
+    const reserve = parseFloat(proprArray[i].reserve);
+    const sum = balance + reserve;
+    const getLtcvolumeRes = await tl.getLtcvolume(propertyid);
+    const ltcVolumePerToken = parseFloat(getLtcvolumeRes.data.volume) || 0;
+    const ltcVolume = ltcVolumePerToken * sum;
+    const data = { propertyid, sum, ltcVolumePerToken, ltcVolume};
+    equityArray.push(data);
+  }
+  return equityArray;
+};
+
+balanceRouter.get('/getAvailableBalance', async (req, res) => {
+  // const addresses = req.query.addresses;
+  const addresses = ['QbbqvDj2bJkeZAu4yWBuQejDd86bWHtbXh'];
+  if (!addresses || !addresses.length) res({error: `No provided Addresses`});
+  const result = [];
+  for (let i=0; i < addresses.length; i++) {
+    const _result = await getBalance(addresses[i]);
+    _result.tokens = await getTokens(addresses[i]);
+    _result.equity = (_result.tokens.map(e => e.ltcVolume).reduce((acc, val) => acc + val, 0)) + parseFloat(_result.confirmed_balance);
+    result.push(_result);
+  }
+
   const sum = {
     address: 'sum',
-    confirmed_balance: sumConfirmed,
-    unconfirmed_balance: sumUnconfirmed,
+    confirmed_balance: result.map(_ => parseFloat(_.confirmed_balance)).reduce((acc, val) => acc + val, 0),
+    unconfirmed_balance: result.map(_ => parseFloat(_.unconfirmed_balance)).reduce((acc, val) => acc + val, 0),
+    // equity: result.map(_ => _.equity).reduce((acc, val) => acc + val, 0),
+    equity: 0,
   }
   result.push(sum);
   res.send(result);
