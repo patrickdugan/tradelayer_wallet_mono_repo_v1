@@ -6,7 +6,7 @@ export const txnType = {
 }
 
 const state = {
-    selectedTxnType: txnType.TOKEN_TOKEN,
+    selectedTxnType: txnType.LTC_INSTANT,
     tokenForSale: null,
     amountForSale: null,
     tokenDesired: null,
@@ -54,7 +54,6 @@ const actions = {
     },
     initTrade({ dispatch, commit, rootState }, options) {
         const { amount, price, market, marketType, action } = options;
-
         switch (marketType) {
             case 'LTC':
                 commit('setSelectedTxnType', txnType.LTC_INSTANT);

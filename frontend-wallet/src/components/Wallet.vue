@@ -29,7 +29,7 @@
             <md-select v-model="selectedTxnType" >
               <md-option :value="txnType.LTC_INSTANT">LTC Instant Trade</md-option>
               <md-option :value="txnType.TOKEN_TOKEN">Token/Token Trade</md-option>
-              <md-option :value="txnType.USD_TRADE">USD Trade</md-option>
+              <md-option :value="txnType.USD_TRADE" disabled>USD Trade</md-option>
               
             </md-select>
           </md-field>
@@ -46,14 +46,27 @@
             <md-field style='width:100%'>
                 <label>Amount:</label>
                 <md-input v-model='amountDesired'></md-input>
-                <span>{{ tokenDesired.name || getSelectedMarket.a.name }}</span>
+                <md-select style='box-shadow: 0 0 5px 1px black' v-model='tokenDesired'>
+                  <md-option :value='market.a.id' :key='market.id' v-for="market in getMarkets" >
+                    {{ market.a.name }}
+                  </md-option>
+                </md-select>
             </md-field>
             </div>
             <div style='display:flex; justify-content: space-between'>
             <md-field style='width:100%'>
                 <label>Price: </label>
                 <md-input v-model='amountForSale'></md-input>
-                <span>{{ tokenForSale.name || getSelectedMarket.b.name }}</span>
+                <md-select style='box-shadow: 0 0 5px 1px black' v-model='tokenForSale'>
+                  <template v-if='selectedMarketTypeId === 3'>
+                    <md-option :value='market.b.id' :key='market.id' v-for="market in getMarkets">
+                      {{ market.b.name }}
+                    </md-option>
+                  </template>
+                  <template v-if='selectedMarketTypeId === 1'>
+                    <md-option :value='1'> LTC </md-option>
+                  </template>
+                </md-select>
             </md-field>
         </div>
       </div>
@@ -63,7 +76,8 @@
       <md-button
         md-button 
         class='md-accent md-raised' 
-        v-on:click="handleBuildRawTx()" 
+        v-on:click="handleBuildRawTx()"
+        :disabled='isDisabled()'
       > 
         Build TX
       </md-button>
@@ -80,7 +94,7 @@ export default {
   data: () => ({
     txnType,
     senderAddress: null,
-    amountDesired: 0,
+    amountDesired: this.amountDesired || 0,
     amountForSale: 0,
     tokenDesired: '',
     tokenForSale: '',
@@ -95,13 +109,18 @@ export default {
       'getAmountForSale', 
       'getAmountDesired',
       ]),
-    ...mapGetters("markets", ["getMarketsTypes", "getSelectedMarket"]),
+    ...mapGetters("markets", ["getMarketsTypes", "getSelectedMarket", "selectedMarketTypeId", "getMarkets"]),
     selectedTxnType: {
       get() {
         return this.getSelectedTxnType;
       },
       set(value) {
+        this.senderAddress = null,
+        this.amountForSale = 0;
+        this.amountDesired = 0;
         this.setSelectedTxnType(value);
+        if (value === 'LTC_INSTANT') this.selectedMarketType(1);
+        if (value === 'TOKEN_TOKEN')  this.selectedMarketType(3);
       }
     },
     LTCmarkets() {
@@ -111,22 +130,38 @@ export default {
   },
   watch: {
     getAmountForSale(v) {
-      this.amountForSale = v;
+      this.amountForSale = v
     },
     getAmountDesired(v) {
       this.amountDesired = v
     },
     getTokenDesired(v) {
-      this.tokenDesired = v
+      this.tokenDesired = v.id
     },
     getTokenForSale(v) {
-      this.tokenForSale = v
+      this.tokenForSale = v.id
     },
+    getSelectedMarket: {
+      immediate: true,
+      handler(market) {
+        this.tokenDesired = market.a.id;
+        this.tokenForSale = market.b.id;
+      }
+    },
+    selectedMarketTypeId: {
+      immediate: true,
+      handler(marketTypeId) {
+        if (marketTypeId === 1) this.setSelectedTxnType(txnType.LTC_INSTANT);
+        if (marketTypeId === 2) this.setSelectedTxnType(txnType.USD_TRADE);
+        if (marketTypeId === 3) this.setSelectedTxnType(txnType.TOKEN_TOKEN);
+      }
+    }
   },
   methods: {
     ...mapActions("wallet", ["setCurrentAddress"]),
     ...mapActions("txns", ["buildRawTx"]),
     ...mapMutations("txns", ["setSelectedTxnType"]),
+    ...mapMutations('markets', ['selectedMarketType', 'selectMarket']),
     updateCurrentUTXOs() {
       console.log('updateCurrentUTXOs');
     },
@@ -139,11 +174,21 @@ export default {
         address: this.senderAddress,
         amountDesired: this.amountDesired,
         amountForSale: this.amountForSale,
-        tokenDesired: this.tokenDesired.id,
-        tokenForSale: this.tokenForSale.id,
+        tokenDesired: this.tokenDesired,
+        tokenForSale: this.tokenForSale,
         type: this.getSelectedTxnType,
       };
-      this.buildRawTx(options)
+      console.log(options)
+      // this.buildRawTx(options)
+    },
+    isDisabled() {
+      return (!this.amountDesired 
+      || !this.amountForSale 
+      || !this.tokenDesired 
+      || !this.tokenForSale
+      || !this.getSelectedTxnType
+      || (this.tokenDesired === this.tokenForSale))
+        ? true : false;
     }
   },
 };

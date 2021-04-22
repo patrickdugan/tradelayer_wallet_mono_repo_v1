@@ -3,7 +3,7 @@
         <div class="menu-container">
             <div
                 class="item"
-                :class="{ selected: selectedMarketTypeId === tab.id }"
+                :class="{ selected: selectedMarketTypeId === tab.id, disabled: tab.id === 2 }"
                 v-on:click="selectedMarketType(tab.id)"
                 v-for="tab of getMarketsTypes" v-bind:key="tab.id"
             >
