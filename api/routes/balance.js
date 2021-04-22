@@ -193,8 +193,8 @@ const getTokens = async (address) => {
     const sum = balance + reserve;
     const getLtcvolumeRes = await tl.getLtcvolume(propertyid);
     const ltcVolumePerToken = parseFloat(getLtcvolumeRes.data.volume) || 0;
-    const ltcVolume = ltcVolumePerToken * sum;
-    const data = { propertyid, sum, ltcVolumePerToken, ltcVolume};
+    const ltcVolume = 1 * sum;
+    const data = { propertyid, sum, ltcVolumePerToken, ltcVolume, balance, reserve};
     equityArray.push(data);
   }
   return equityArray;
@@ -212,16 +212,31 @@ balanceRouter.get('/getAvailableBalance', async (req, res) => {
     result.push(_result);
   }
 
+  const sumTokens = [];
+  result.map(r => r.tokens).forEach(st => {
+    st.forEach(t => {
+      const existed = sumTokens.find(e => e.propertyid === t.propertyid);
+      if (existed) {
+        const { balance, reserve, sum } = t;
+        existed.balance += balance;
+        existed.reserve += reserve;
+        existed.sum += sum;
+      } else {
+        sumTokens.push(t);
+      }
+    })
+  })
   const sum = {
     address: 'sum',
     confirmed_balance: result.map(_ => parseFloat(_.confirmed_balance)).reduce((acc, val) => acc + val, 0),
     unconfirmed_balance: result.map(_ => parseFloat(_.unconfirmed_balance)).reduce((acc, val) => acc + val, 0),
-    // equity: result.map(_ => _.equity).reduce((acc, val) => acc + val, 0),
-    equity: 0,
+    equity: result.map(_ => _.equity).reduce((acc, val) => acc + val, 0),
+    tokens: sumTokens,
   }
   result.push(sum);
   res.send(result);
   } catch(error) {
+    console.log(error.message);
     res.send(error.message);
   }
 })

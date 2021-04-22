@@ -84,22 +84,23 @@
 
     <div>
       <md-table>
-        <md-tabs class="tabs-tight">
+        <md-tabs class="tabs-tight" md-active-tab='tab-content-contractBalances'>
           <md-tab
             style="margin: 0px 0px -20px;"
             id="tab-content-positions"
             class
             md-label="Positions"
+            md-disabled
           >
             <Positions />
           </md-tab>
-          <md-tab id="tab-content-active-pos" class md-label="Active">
+          <md-tab id="tab-content-active-pos" class md-label="Active" md-disabled>
             <Active />
           </md-tab>
-          <md-tab id="tab-content-fills" class="tab-tight md-label-tight" md-label="Fills">
+          <md-tab id="tab-content-fills" class="tab-tight md-label-tight" md-label="Fills" md-disabled>
             <HistoricalTradesbyAddress />
           </md-tab>
-          <md-tab id="tab-content-pending" class="tab-tight md-label-tight" md-label="Pending">
+          <md-tab id="tab-content-pending" class="tab-tight md-label-tight" md-label="Pending" md-disabled>
             <Pending />
           </md-tab>
           <md-tab id="tab-content-contractBalances" class="tab-tight md-label-tight" md-label="Balances">

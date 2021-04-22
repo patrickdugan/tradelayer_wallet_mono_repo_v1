@@ -32,6 +32,7 @@ const state = {
   // selectedToken: 0,
   ltcAvailable: 0,
   equity: 0,
+  tokens: [],
 }
 
 // reusable helpers
@@ -75,11 +76,12 @@ const actions = {
   async availableBalanceAction({ commit, state, dispatch}) {
     const addresses = state.walletDec.map(a => a.publicAddress);
     const balance = await walletService.getAvailableBalance(addresses);
-    console.log({balance})
     const totalAvailable = balance.find(b => b.address === "sum").confirmed_balance;
-    const equity = balance.find(b => b.address === "sum").equity
+    const equity = balance.find(b => b.address === "sum").equity;
+    const tokens = balance.find(b => b.address === "sum").tokens;
     commit('setLtcAvailable', totalAvailable);
     commit('setEquity', equity);
+    commit('setTokens', tokens);
   },
   // async createCustomRawTx({ commit, state }, txBuildOptions){
   //   const buildRawTxResult = await walletService.buildRawTx(txBuildOptions);
@@ -208,6 +210,10 @@ const mutations = {
 
   setEquity(state, amount) {
     state.equity = amount;
+  },
+
+  setTokens(state, tokens) {
+    state.tokens = tokens;
   },
 
   addKeyPair(state, { password, next, error }) {
@@ -346,6 +352,10 @@ const getters = {
 
   getEquity(state) {
     return state.equity;
+  },
+
+  getTokens(state) {
+    return state.tokens;
   },
 
   walletCountDisplay(state) {
