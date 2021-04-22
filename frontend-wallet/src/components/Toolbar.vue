@@ -68,7 +68,7 @@
               <md-icon class="md-left">person_add</md-icon>
             </router-link>
           </div>
-          <div class="md-layout-item">
+          <!-- <div class="md-layout-item disabled">
             <circle-menu type="bottom" :number="4" animate="animated" mask="white" circle>
               <button type="button" slot="item_btn"></button>
               <router-link to="/Balances" slot="item_1">
@@ -88,7 +88,7 @@
                 <md-icon class>spellcheck</md-icon>
               </router-link>
             </circle-menu>
-          </div>
+          </div> -->
         </div>
       </div>
     </md-toolbar>

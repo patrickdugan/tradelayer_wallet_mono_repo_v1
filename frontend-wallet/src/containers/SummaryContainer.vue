@@ -1,6 +1,7 @@
 <template>
   <div id="SummaryContainer">
     <!-- <MainChart /> -->
+    <SubMenu />
     <div class="md-layout md-alignment-top-center">
       <div class="md-xsmall-hide md-small-hide md-layout-item md-small-size-100 md-medium-size-25 md-large-size-25">
         <md-table md-card>
@@ -124,6 +125,8 @@ import Pending from "@/components/Pending";
 import TradeChannels from "@/components/TradeChannels";
 import ContractBalances from "@/components/ContractBalances";
 import MainChart from '@/components/MainChart';
+import SubMenu from '@/components/SubMenu';
+
 // import Balances from '@/components/Balances'
 
 export default {
@@ -157,6 +160,7 @@ export default {
     TradeChannels,
     ContractBalances,
     MainChart,
+    SubMenu
   }
 };
 </script>

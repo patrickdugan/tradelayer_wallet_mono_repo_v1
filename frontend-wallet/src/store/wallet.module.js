@@ -219,7 +219,7 @@ const mutations = {
     }
     return error && error()
   },
-  addKeyPairFromWif(state, { wifKey, password }) {
+  addKeyPairFromWif(state, { wifKey, password, next }) {
     if ((state.walletEnc.length > 0) && !decryptWalletExtracted(state, password)) {
       return false
     }
@@ -229,27 +229,38 @@ const mutations = {
     try {
       const publicAddress = wifToPubKey(wifKey)
       addKeyPairToState(state, { wifKey, publicAddress }, password)
-    } catch(err) { alert('Wrong Recovery Key') }
+      next(true);
+    } catch(err) { 
+      alert('Wrong Recovery Key');
+      next(false);
+     }
     
   },
-  addKeyPairFromEncWifArray(state, { wifKeys, password }) {
+  addKeyPairFromEncWifArray(state, { wifKeys, password, next }) {
     if ((state.walletEnc.length > 0) && !decryptWalletExtracted(state, password)) {
       return false
     }
 
     const decryptedWallet = wifKeys.map(encWifKey => {
-      const wifKey = decryptKey(encWifKey, password);
-      if(!wifKey) return false;
-      const publicAddress = wifToPubKey(wifKey);
-      return { wifKey, publicAddress}
+      try {
+        const wifKey = decryptKey(encWifKey, password);
+        if(!wifKey) return false;
+        const publicAddress = wifToPubKey(wifKey);
+        return { wifKey, publicAddress}
+      } catch(error) {
+        console.log(error.message)
+        return false;
+      }
     })
-    if(decryptedWallet.some(e => !e)) {
-      alert('Wrong Recovery Keys/Json or password')
+    if (!decryptedWallet.length || decryptedWallet.some(e => !e)) {
+      alert('Wrong Recovery Keys/Json or password');
+      next(false)
     } else {
       decryptedWallet.forEach(w => {
         const { wifKey, publicAddress} = w;
         addKeyPairToState(state, { wifKey, publicAddress }, password)
-      })
+      });
+      next(true)
     }
     
   },

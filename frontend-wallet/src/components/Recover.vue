@@ -70,13 +70,25 @@
       handleSubmit() {
         this.submitted = true
         const { wifKey, password } = this
-        this.addKeyPairFromWif({ wifKey, password })
+        this.addKeyPairFromWif({ wifKey, password,next: (res) =>{
+            if (res){
+              this.$router.push('/Summary')
+            } else {
+              // this.errors.push('invallid password; try again')
+            }
+        } })
         this.$refs.keyForm.reset() 
       },
       handleSubmitJson(){
         this.submittedJson = true
         const { wifKeys, passwordJson } = this;
-        this.addKeyPairFromEncWifArray({ wifKeys, password: passwordJson })
+        this.addKeyPairFromEncWifArray({ wifKeys, password: passwordJson, next: (res) => {
+            if (res){
+              this.$router.push('/Summary')
+            } else {
+              // this.errors.push('invallid password; try again')
+            }
+        }})
         this.$refs.jsonForm.reset() 
       },
       handleFileInputChange(event) {

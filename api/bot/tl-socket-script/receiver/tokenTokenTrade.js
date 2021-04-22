@@ -103,39 +103,47 @@ var TokenTokenTrade = /** @class */ (function (_super) {
             });
         });
     };
-    TokenTokenTrade.prototype._bildTokenTokenTrade = function (unspents) {
+    TokenTokenTrade.prototype._bildTokenTokenTrade = function (msus) {
+        var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var bbData, trade, propertyid, amount, propertydesired, amountdesired, address, gci, cpitOptions, cpitRes, vins, bttt;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var bbData, trade, propertyid, amount, propertydesired, amountdesired, address, gci, cpitOptions, cpitRes, vins, gtRes, firstAddress, secondAddress, bttt;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
                         this.log("Building Token/Token Trade");
                         return [4 /*yield*/, this.getBestBlock(10)];
                     case 1:
-                        bbData = _a.sent();
+                        bbData = _b.sent();
                         this.log("Creating Instat Trade payload");
                         trade = this.trade;
                         propertyid = trade.propertyid, amount = trade.amount, propertydesired = trade.propertydesired, amountdesired = trade.amountdesired, address = trade.address;
                         return [4 /*yield*/, tl_api_1.api.getchannel_info(address)];
                     case 2:
-                        gci = _a.sent();
+                        gci = _b.sent();
                         if (gci.error || !gci.data)
                             return [2 /*return*/, this.terminateTrade(gci.error || 'Error with Getting Multisig Channel info')];
                         cpitOptions = [propertyid, amount, propertydesired, amountdesired, bbData];
                         return [4 /*yield*/, tl_api_1.api.createPayload_instantTrade.apply(tl_api_1.api, cpitOptions)];
                     case 3:
-                        cpitRes = _a.sent();
+                        cpitRes = _b.sent();
                         if (cpitRes.error || !cpitRes.data)
                             return [2 /*return*/, this.terminateTrade(cpitRes.error || 'Error with Creating the Payload')];
                         this.log("Created Instat Trade payload: " + cpitRes.data);
-                        vins = unspents.map(function (us) { return ({ txid: us.txid, vout: us.vout, scriptPubKey: us.scriptPubKey, value: us.amount }); });
-                        return [4 /*yield*/, tl_api_1.api.buildTokenTokenTrade(vins, cpitRes.data, address)];
+                        vins = msus.map(function (us) { return ({ txid: us.txid, vout: us.vout }); });
+                        return [4 /*yield*/, tl_api_1.api.tl_gettransaction(msus[0].txid)];
                     case 4:
-                        bttt = _a.sent();
-                        if (bttt.error || !bttt.data)
+                        gtRes = _b.sent();
+                        if (gtRes.error || !((_a = gtRes.data) === null || _a === void 0 ? void 0 : _a.sendingaddress))
+                            return [2 /*return*/, this.terminateTrade(cpitRes.error)];
+                        firstAddress = address;
+                        secondAddress = gtRes.data.sendingaddress;
+                        return [4 /*yield*/, tl_api_1.api.buildTokenTokenTrade(vins, cpitRes.data, firstAddress, secondAddress)];
+                    case 5:
+                        bttt = _b.sent();
+                        if (bttt.error || !bttt.data.hex)
                             return [2 /*return*/, this.terminateTrade(cpitRes.error || 'Error with Creating the Payload')];
-                        this.log("Created RawTx: " + bttt.data);
-                        return [2 /*return*/, bttt.data];
+                        this.log("Created RawTx: " + bttt.data.hex);
+                        return [2 /*return*/, bttt.data.hex];
                 }
             });
         });

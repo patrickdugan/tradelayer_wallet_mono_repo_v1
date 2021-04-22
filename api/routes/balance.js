@@ -201,8 +201,8 @@ const getTokens = async (address) => {
 };
 
 balanceRouter.get('/getAvailableBalance', async (req, res) => {
-  // const addresses = req.query.addresses;
-  const addresses = ['QbbqvDj2bJkeZAu4yWBuQejDd86bWHtbXh'];
+  try {
+  const addresses = req.query.addresses;
   if (!addresses || !addresses.length) res({error: `No provided Addresses`});
   const result = [];
   for (let i=0; i < addresses.length; i++) {
@@ -221,6 +221,9 @@ balanceRouter.get('/getAvailableBalance', async (req, res) => {
   }
   result.push(sum);
   res.send(result);
+  } catch(error) {
+    res.send(error.message);
+  }
 })
 
 balanceRouter.get('/getEquity', function(req, res){

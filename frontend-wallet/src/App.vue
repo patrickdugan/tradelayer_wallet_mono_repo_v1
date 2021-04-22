@@ -7,7 +7,6 @@
           <md-tab id="tab-charts" md-label="Charts" to="/Charts" md-disabled></md-tab>
           <md-tab id="tab-taxes" md-label="Taxes" to="/Taxes" md-disabled></md-tab>
         </md-tabs>
-    <SubMenu />
     <md-drawer id="wallet-container" class="md-left" :md-active.sync="showWallet">
       <Wallet />
     </md-drawer>
@@ -23,7 +22,6 @@
 import Toolbar from "@/components/Toolbar"
 import Wallet from "@/components/Wallet";
 import Navigation from "@/components/Navigation"
-import SubMenu from '@/components/SubMenu';
 import { mapGetters, mapMutations, mapState, mapActions } from "vuex";
 
 export default {
@@ -32,7 +30,6 @@ export default {
     Wallet,
     Navigation,
     Toolbar,
-    SubMenu,
   },
   data: () => ({
     showNavigation: false,
@@ -47,7 +44,6 @@ export default {
   },
     watch: {
     getAlert: function(n){
-      console.log({n})
       if (!n.type) return;
       this.$toast[n.type](n.message);
       this.clear()

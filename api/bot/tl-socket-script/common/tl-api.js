@@ -199,12 +199,12 @@ exports.api.getBestBlock = function () { return __awaiter(void 0, void 0, void 0
         }
     });
 }); };
-exports.api.buildTokenTokenTrade = function (vins, payload, changeAddress) { return __awaiter(void 0, void 0, void 0, function () {
-    var tl_createrawtx_inputAll, crtxiRes, crtxrRes, crtxoRes;
+exports.api.buildTokenTokenTrade = function (vins, payload, firstAddress, secondAddress) { return __awaiter(void 0, void 0, void 0, function () {
+    var tl_createrawtx_inputAll, crtxiRes, crtxrRes, crtxoRes, frtRes;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                if (!(vins === null || vins === void 0 ? void 0 : vins.length) || !payload || !changeAddress)
+                if (!(vins === null || vins === void 0 ? void 0 : vins.length) || !payload || !firstAddress || !secondAddress)
                     return [2 /*return*/, { error: 'Missing vins, payload or ChangeAddress' }];
                 tl_createrawtx_inputAll = function () { return __awaiter(void 0, void 0, void 0, function () {
                     var hex, _i, vins_1, vin, crtxiRes_1;
@@ -236,7 +236,7 @@ exports.api.buildTokenTokenTrade = function (vins, payload, changeAddress) { ret
                 crtxiRes = _a.sent();
                 if (crtxiRes.error || !crtxiRes.data)
                     return [2 /*return*/, { error: 'Error with creating raw tx' }];
-                return [4 /*yield*/, asyncClient('tl_createrawtx_reference', crtxiRes.data, changeAddress)];
+                return [4 /*yield*/, asyncClient('tl_createrawtx_reference', crtxiRes.data, secondAddress)];
             case 2:
                 crtxrRes = _a.sent();
                 if (crtxrRes.error || !crtxrRes.data)
@@ -246,11 +246,16 @@ exports.api.buildTokenTokenTrade = function (vins, payload, changeAddress) { ret
                 crtxoRes = _a.sent();
                 if (crtxoRes.error || !crtxoRes.data)
                     return [2 /*return*/, { error: 'Error with adding payload' }];
-                return [2 /*return*/, crtxoRes];
+                return [4 /*yield*/, asyncClient('fundrawtransaction', crtxoRes.data, { changeAddress: firstAddress, changePosition: 0 })];
+            case 4:
+                frtRes = _a.sent();
+                if (frtRes.error || !frtRes.data)
+                    return [2 /*return*/, { error: 'Error with Funding the RawTX' }];
+                return [2 /*return*/, frtRes];
         }
     });
 }); };
-exports.api.buildLTCInstantTrade = function (vins, payload, refAddress, price, changeAddress) { return __awaiter(void 0, void 0, void 0, function () {
+exports.api.buildLTCInstantTrade = function (vins, payload, changeAddress, price, refAddress) { return __awaiter(void 0, void 0, void 0, function () {
     var tl_createrawtx_inputAll, crtxiRes, crtxrRes, crtxoRes, frtRes;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -297,7 +302,7 @@ exports.api.buildLTCInstantTrade = function (vins, payload, refAddress, price, c
                 crtxoRes = _a.sent();
                 if (crtxoRes.error || !crtxoRes.data)
                     return [2 /*return*/, { error: 'Error with adding payload' }];
-                return [4 /*yield*/, asyncClient('fundrawtransaction', crtxoRes.data, { changeAddress: changeAddress })];
+                return [4 /*yield*/, asyncClient('fundrawtransaction', crtxoRes.data, { changeAddress: changeAddress, changePosition: 0 })];
             case 4:
                 frtRes = _a.sent();
                 if (frtRes.error || !frtRes.data)
