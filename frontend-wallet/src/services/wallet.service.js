@@ -135,7 +135,7 @@ const validateAddress = async (address) => {
 
 const getAvailableBalance = async (addresses) => {
   const params = { addresses }
-  const res = await axiosInstance.get('/balances/getAvailableBalance', { params });
+  const res = await axiosInstance.get('/balance/getAvailableBalance', { params });
   return res.data;
 }
 

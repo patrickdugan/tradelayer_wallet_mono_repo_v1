@@ -159,7 +159,7 @@ export default {
   },
   methods: {
     ...mapActions("wallet", ["setCurrentAddress"]),
-    ...mapActions("txns", ["buildRawTx"]),
+    ...mapActions("txns", ["buildRawTx", "submitTrade"]),
     ...mapMutations("txns", ["setSelectedTxnType"]),
     ...mapMutations('markets', ['selectedMarketType', 'selectMarket']),
     updateCurrentUTXOs() {
@@ -178,8 +178,8 @@ export default {
         tokenForSale: this.tokenForSale,
         type: this.getSelectedTxnType,
       };
-      console.log(options)
-      // this.buildRawTx(options)
+      
+      this.submitTrade(options)
     },
     isDisabled() {
       return (!this.amountDesired 

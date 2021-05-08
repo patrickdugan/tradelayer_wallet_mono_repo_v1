@@ -6,12 +6,12 @@ import { rpcApis } from '../services/rpc-api.service';
 import { walletService } from '../services/wallet.service';
 const { txnTypeEnum } = walletService
 socket.on("connect", () => {
-  socket.emit('listeners-list', {});
+  socket.emit('counterparties');
 });
 
-socket.on("listeners-list", (listenersList) => {
-  console.log(`Listeners list Received`)  
-  window.listenersList = listenersList
+socket.on("counterparties", (counterpartiesList) => {
+  console.log(`Listeners list Received`, counterpartiesList)  
+  window.listenersList = counterpartiesList;
 })
 
 socket.on('CHECK_COMMITS_RES', async (data) => {

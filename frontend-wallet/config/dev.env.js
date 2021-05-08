@@ -9,6 +9,6 @@ const socketPort = process.env.DEV_SOCKET_PORT || 75
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  API_URL: `"${baseUrl}:${basePort}/api"`,
+  API_URL: `"${baseUrl}:${basePort}"`,
   SOCKET_URL:`"${baseUrl}:${socketPort}"`
 })

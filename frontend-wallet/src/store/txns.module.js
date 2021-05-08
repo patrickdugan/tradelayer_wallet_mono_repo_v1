@@ -1,4 +1,6 @@
 import { txnService } from '../services/txn.service';
+const { wifToPublicKey } = require('../../lib/wallet')
+
 export const txnType = {
     LTC_INSTANT: 'LTC_INSTANT',
     TOKEN_TOKEN: 'TOKEN_TOKEN',
@@ -22,6 +24,14 @@ const getters = {
 };
 
 const actions = {
+    async submitTrade({ dispatch, commit, rootState }, tradeInfo) {
+        const { address, type } = tradeInfo;
+        if (!address || !type ) return;
+        const publicKey = wifToPublicKey(rootState.wallet.walletDec.find(a => a.publicAddress === tradeInfo.address).wifKey);
+        const result = await txnService.submitTrade(tradeInfo);
+        console.log({result});
+    },
+
     async buildRawTx({ dispatch, commit, rootState }, options) {
         const { amountDesired, amountForSale, tokenDesired, tokenForSale, type, address } = options;
         if (!address || !type) return;

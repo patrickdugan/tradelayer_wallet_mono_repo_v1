@@ -37,6 +37,8 @@ const wifToPubKey = (wifKey) => {
   return privateKey.toAddress().toString();
 }
 
+const wifToPublicKey = (wifKey) => new litecore.PrivateKey(wifKey).toPublicKey().toString();
+
 // bip38's encrypt/decrypt is incredibly slow, swapping for Cryptr for now:
 const encryptKey = (wifKey, password) => {
   const cryptr = new Cryptr(password);
@@ -90,5 +92,5 @@ const txsJsonLink = (data) => {
 }
 
 module.exports = {
-  txsJsonLink, wifToPubKey, encryptKey, decryptKey, generateKeyPair, createTxn, signTxn, createOpReturnTxn
+  txsJsonLink, wifToPubKey, encryptKey, decryptKey, generateKeyPair, createTxn, signTxn, createOpReturnTxn, wifToPublicKey
 }

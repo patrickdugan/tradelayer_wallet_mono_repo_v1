@@ -10,7 +10,13 @@ const tokenTokenTrade = async (buildOptions) => {
     return result.data;
 }
 
+const submitTrade = async (tradeInfo) => {
+    const result = await axiosInstance.get('/trade/submitTrade', { params: tradeInfo });
+    return result.data;
+}
+
 export const txnService = {
     ltcInstantTrade,
     tokenTokenTrade,
+    submitTrade,
 }

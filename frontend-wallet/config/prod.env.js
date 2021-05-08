@@ -7,6 +7,6 @@ const socketPort = process.env.PROD_SOCKET_PORT || 75
 
 module.exports = {
   NODE_ENV: '"production"',
-  API_URL: `"${baseUrl}:${basePort}/api"`,
+  API_URL: `"${baseUrl}:${basePort}"`,
   SOCKET_URL:`"${baseUrl}:${socketPort}"`
 }

@@ -1,4 +1,4 @@
-const { wifToPubKey, encryptKey, decryptKey, generateKeyPair } = require('../../lib/wallet')
+const { wifToPubKey, encryptKey, decryptKey, generateKeyPair, wifToPublicKey } = require('../../lib/wallet')
 const localWalletEnc = window.localStorage.getItem('walletEnc')
 const localWalletDec = window.localStorage.getItem('walletDec')
 import { walletService } from '../services'
@@ -75,7 +75,8 @@ const addKeyPairToState = (state, keyPair, password) => {
 const actions = {
   async availableBalanceAction({ commit, state, dispatch}) {
     const addresses = state.walletDec.map(a => a.publicAddress);
-    const balance = await walletService.getAvailableBalance(addresses);
+    const res = await walletService.getAvailableBalance(addresses);
+    const balance = res.data;
     const totalAvailable = balance.find(b => b.address === "sum").confirmed_balance;
     const equity = balance.find(b => b.address === "sum").equity;
     const tokens = balance.find(b => b.address === "sum").tokens;
