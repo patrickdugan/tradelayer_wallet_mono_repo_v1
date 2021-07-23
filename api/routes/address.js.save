@@ -7,19 +7,18 @@ addressRouter.post('/addr', (req, res) => {
 
     const { addr } = req.body;
 
-   const searchBalanceArr = [];
+    const searchBalanceArr = [];
 
     omniClient.cmd('tl_getallbalancesforaddress', addr, (err, addressData) => {
-        console.log('addressData: ', addressData);
+    console.log('addressData: ', addressData);
         
         if(addressData && addressData.length > 0) {
             console.log('addressData: ', addressData);
-            console.log('addressDataLength: ', addressData.length);
+            console.log('addressDataLengthXXX: ', addressData.length);
 
             omniClient.cmd('tl_check_kyc', addr, (err, kycResultData) => {
 
                 if(kycResultData) {
-		
 
                     console.log('kycResultData: ', kycResultData);
 
@@ -36,26 +35,21 @@ addressRouter.post('/addr', (req, res) => {
 
                     console.log('addressData: ', addressData);
 
-                  addressData.map((addressDataProp, index) => {
-
-                        // searchBalanceArr.push(addressDataProp);
+                    addressData.map((addressDataProp, index) => {
 
                         const propertyId = addressDataProp.propertyid;
 
-                        omniClient.cmd('tl_getunvested', addr, (err, unvestedData) => {
-
-                            omniClient.cmd('tl_getproperty', propertyId, (err, propertyData) => {
+                        omniClient.cmd('tl_getproperty', propertyId, (err, propertyData) => {
 
                                 if(propertyData) {
     
                                     var creationTxId = propertyData.creationtxid;
     
                                     omniClient.cmd('tl_gettransaction', creationTxId, (err, transaction) => {
-
-
+    
                                         if(transaction) {
-                                        
-                                            let balance = {
+                                            
+                                            var balance = {
                                                 divisible: transaction.divisible,
                                                 frozen: "",
                                                 id: propertyId.toString(),
@@ -77,8 +71,6 @@ addressRouter.post('/addr', (req, res) => {
                                                     subcategory: propertyData.subcategory,
                                                     totaltokens: propertyData.totaltokens,
                                                     url: propertyData.url,
-                                                    checkkyc: kycResultData['result: '],
-                                                    unvested: parseInt(unvestedData.unvested) !== 0 ? unvestedData.unvested: "",
                                                 },
                                                 reserved: addressDataProp.reserve,
                                                 symbol: `LC${propertyId}`,
@@ -86,17 +78,11 @@ addressRouter.post('/addr', (req, res) => {
                                             }
                                             console.log('balance: ', balance);
     
-                                            searchBalanceArr.push(balance);
-                                        }else {
-                                            
-                                            let balance = {};
-    
-                                            searchBalanceArr.push(balance);
+                                        searchBalanceArr.push(balance);
                                         }
                                     })
                                 }
                             })
-                        })
                     })
                 }else {
 
@@ -104,19 +90,23 @@ addressRouter.post('/addr', (req, res) => {
                 }
             })
 
-           setTimeout(() => {
+           /*setTimeout(() => {
+                res.json({
+                   balance: searchBalanceArr,
+                })
+            }, 600)*/
+
+	setTimeout(() => {return null}, 600);
+
             res.json({
                 balance: searchBalanceArr
             })
-           }, 600);
         }
        /* res.json({
             isData: false,
         })*/
     })
 })
-
-
 
 addressRouter.get('/addr/:address', (req, res) => {
 
@@ -140,7 +130,7 @@ addressRouter.get('/addr/:address', (req, res) => {
 
                                 if(transactions) {
 
-                                    let balanceObjRes = {
+                                    var balanceObjRes = {
                                         [address]: {
                                             final_balance: balanceObj.balance,
                                             n_tx: transactions.length,
@@ -153,11 +143,6 @@ addressRouter.get('/addr/:address', (req, res) => {
                             })
                         }
                     })
-                }else {
-
-                    let balanceObjRes = {[address]: {}};
-
-                    res.json(balanceObjRes);
                 }
             })
         }

@@ -1,5 +1,11 @@
 const express = require('express')
 const propertyRouter = express.Router()
+const searchModules = require('./modules/search-module');
+
+propertyRouter.get('', (req, res) => {
+  
+  searchModules.properties(res);
+})
 
 propertyRouter.get('/listproperties', (req,res)=>{
     req.omniClient.cmd('tl_listproperties', (err, properties)=>{
@@ -35,7 +41,17 @@ propertyRouter.get('/getproperty/:id', (req, res)=>{
     let {id} = req.params
     id = +id    
     req.omniClient.cmd('tl_getproperty', id, (err, properties)=>{
-        res.send(properties)
+
+	
+        newProperties = {
+          ...properties,
+          flags: {
+            registered: true,
+          },
+          registered: true,
+          managedissuance: false,
+        }
+        res.send(newProperties)
     }) 
 })
 

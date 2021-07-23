@@ -22,9 +22,9 @@ tl.init = function(user, pass, otherip, test){
   if(test == false || test == null){port = 19332}else{port=19336}  
   var client = new litecoin.Client({
     host: "localhost",
-    port: 19332,
-    user: "pepejandro",
-    pass: "pepecash",
+    port: 9432,
+    user: "because",
+    pass: "whyDidTheBulletProofElephantCrossTheRoad",
     timeout:30000,
     ssl:false
   })
@@ -379,8 +379,9 @@ tl.listPendingTransactions= function(addressfilter, cb){
     })
 }
 
-tl.send = function(address, address2, id, amount, cb){
-    client.cmd('tl_send', address, address2, id, amount, function(err, data, resHeaders){
+tl.send = function(address1, address2, id, amount, cb){
+    client.cmd('tl_send', address1, address2, id, amount.toString(), function(err, data, resHeaders){
+        if(err){data=err}
         return cb(data)
     })
 }

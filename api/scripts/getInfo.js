@@ -32,8 +32,8 @@ const getInfo = (getInfoParams) => {
             omniClient.cmd('tl_getinfo', (err, response) => {
     
                 if(response) {
-                    redisClient.setex(getInfoRedisKey, 3600, JSON.stringify(response));
-                    redisClient.setex(blocksInfoRedisKey, 3600, JSON.stringify([]));
+                    redisClient.setex(getInfoRedisKey, 36000, JSON.stringify(response));
+                    redisClient.setex(blocksInfoRedisKey, 36000, JSON.stringify([]));
                     console.log('getInfo', JSON.parse(getInfo))
                     console.log('blocksInfo', JSON.parse(blocksInfo))
                     return {

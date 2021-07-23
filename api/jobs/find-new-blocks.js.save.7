@@ -42,7 +42,7 @@ const findNewBlocks = () => {
 
                                 console.log('oldBlocks: ', hashBlock)
                                 console.log('blockTransactions: ', blockTransactions)
-                                if((blockTransactions) && (blockTransactions !== undefined) && (blockTransactions.length >= 1)) {
+                                if((blockTransactions) && (blockTransactions.length >= 1)) {
 
                                     console.log('block transaction length: ', blockTransactions.length)
 
@@ -55,53 +55,83 @@ const findNewBlocks = () => {
         
                                                 if(blocksObj) {
                                                     console.log('blocksObj', blocksObj)
-                                                    console.log('heights: ', blocksObj.height)
         
-                                                    
                                                     blockTransactions.map((blockTransaction, index) => {
                                                         console.log('blockTransaction: ', blockTransaction)
-                                                    
+                
                                                         omniClient.cmd('tl_gettransaction', blockTransaction, (err, transaction) => {
                                                             console.log('transaction: ', transaction)
                                                             if(transaction) {
-                                                    
+
                                                                 console.log('transaction: ', transaction)
-                                                    
-                                                             var propertyData = transaction.propertyid !== ''? omniClient.cmd('tl_getproperty', transaction.propertyid, (err, propertyData) => propertyData) : false;
-                                                    
-                                                                console.log('property data: ', propertyData);
-                                                    
-                                                                var value = {
-                                                                    details: {
-                                                                        [transaction.propertyid !== ''? transaction.propertyid: ""]: {
-                                                                            flags: null,
-                                                                            invalid: 0,
-                                                                            name: transaction.propertyname !== ''? transaction.propertyname : "",
-                                                                            rate_usd,
-                                                                            tx_count: blockTransactions.length,
-                                                                            value_usd_rounded: "",
-                                                                            volume: "",
+
+																								 if(transaction.propertyid !== '' && transaction.propertyname !== '') {
+                
+                                                               omniClient.cmd('tl_getproperty', transaction.propertyid, (err, propertyData) => {
+                
+                                                                    if(propertyData) {
+                                                                       console.log('property data: ', propertyData)
+                
+                
+                                                                        var value = {
+                                                                            details: {
+                                                                                [transaction.propertyid]: {
+                                                                                    flags: null,
+                                                                                    invalid: 0,
+                                                                                    name: transaction.propertyname,
+                                                                                    rate_usd,
+                                                                                    tx_count: blockTransactions.length,
+                                                                                    value_usd_rounded: "",
+                                                                                    volume: "",
+                                                                                }
+                                                                            },
+                                                                            total_usd: "",
+                                                                            value_24hr: propertyData['last 24h Token volume'],
                                                                         }
-                                                                    },
-                                                                    total_usd: "",
-                                                                    value_24hr: propertyData !== undefined ? propertyData['last 24h Token volume'] : "",
+                                                                        valueArr[0] = value;
+                                                                        valueArr[1] += parseFloat(transaction.amount !== undefined ? transaction.amount: 0);
+                                                                        valueArr[2] = transaction.propertyid;
+
+                                                                        setTimeout(() => {
+                                                                          console.log('value arr: ', valueArr)  
+                                                                        }, 800)
+                                                                    }else{console.log('no property data: ', err)}
+                                                                })
+								
+								if(transaction.type == 'KYC Attestation') {
+
+                                                                    var value = {
+                                                                        details: {
+                                                                            "": {
+                                                                                flags: null,
+                                                                                invalid: 0,
+                                                                                name: "",
+                                                                                rate_usd,
+                                                                                tx_count: blockTransactions.length,
+                                                                                value_usd_rounded: "",
+                                                                                volume: "",
+                                                                            }
+                                                                        },
+                                                                        total_usd: "",
+                                                                        value_24hr: "",
+                                                                    }
+                                                                    valueArr[0] = value;
+                                                                    valueArr[1] = "";
+                                                                    valueArr[2] = "";
+
+                                                                    setTimeout(() => {
+                                                                      console.log('value arr: ', valueArr)  
+                                                                    }, 600)
                                                                 }
-                                                                valueArr[0] = value;
-                                                                valueArr[1] += parseFloat(transaction.amount !== undefined ? transaction.amount: 0);
-                                                                valueArr[2] = transaction.propertyid !== ''? transaction.propertyid: "";
-                                                    
-                                                                setTimeout(() => {
-                                                                  console.log('value arr: ', valueArr)  
-                                                                }, 800)
-                                                    
+						
                                                             }else{
                                                                 console.log('no transaction: ', err)
                                                             }
                                                         })
                                                     })
-                                                    
+
                                                     setTimeout(() => {
-                                                    
+
                                                         console.log('value array: ', {...valueArr[0]});
                                                         console.log('property id: ', valueArr[2]);
                                                         const blocksInfoObj = {
@@ -123,9 +153,8 @@ const findNewBlocks = () => {
                                                             }
                                                         }
                                                         //blocksInfoArr.concat(blocksInfoObj);
-                                                        redisClient.setex(blocksInfoRedisKey, 1060000, JSON.stringify(blocksInfoArr.concat(blocksInfoObj).sort((a, b) => { return a.block - b.block}).filter((blocksInfoFilObj, index, self) => index === self.findIndex(t => t.block === blocksInfoFilObj.block))));
+                                                        redisClient.setex(blocksInfoRedisKey, 36000, JSON.stringify(blocksInfoArr.concat(blocksInfoObj).sort((a, b) => { return a.block - b.block}).filter((blocksInfoFilObj, index, self) => index === self.findIndex(t => t.block === blocksInfoFilObj.block))));
                                                     }, 800)
-
                                                 }
                                             })
                                         }
