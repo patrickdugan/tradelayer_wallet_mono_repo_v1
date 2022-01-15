@@ -33,7 +33,7 @@
     "keypair": "^1.0.1",
     "litecore-lib": "^0.13.22",
     "mdbvue": "^4.5.1",
-    "node-forge": "^0.7.6",
+    "node-forge": "^1.0.0",
     "node-sass": "^4.11.0",
     "nodejs-base64": "^1.0.3",
     "npm": "^6.2.0",
